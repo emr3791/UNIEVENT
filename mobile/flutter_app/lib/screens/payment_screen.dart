@@ -101,21 +101,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('Ödeme Başarılı!'),
+        title: const Text('Ödeme Başarılı!'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: Colors.green,
               size: 64,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              '${_quantity} adet bilet satın aldınız',
+              '$_quantity adet bilet satın aldınız',
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Biletleriniz e-postanıza gönderilmiştir.',
               textAlign: TextAlign.center,
@@ -129,9 +129,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Navigator.popUntil(context, (route) => route.isFirst);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF6366F1),
+              backgroundColor: const Color(0xFF6366F1),
             ),
-            child: Text(
+            child: const Text(
               'Ana Sayfaya Dön',
               style: TextStyle(color: Colors.white),
             ),
@@ -145,8 +145,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bilet Satın Al'),
-        backgroundColor: Color(0xFF6366F1),
+        title: const Text('Bilet Satın Al'),
+        backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -155,8 +155,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             // Event Summary
             Container(
-              padding: EdgeInsets.all(16),
-              color: Color(0xFF6366F1).withOpacity(0.05),
+              padding: const EdgeInsets.all(16),
+              color: const Color(0xFF6366F1).withOpacity(0.05),
               child: Row(
                 children: [
                   Container(
@@ -173,7 +173,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             'https://via.placeholder.com/80',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
+                          return const Icon(
                             Icons.event,
                             color: Color(0xFF6366F1),
                           );
@@ -181,24 +181,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.event.title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           'Fiyat: ₺${widget.event.price?.toStringAsFixed(2) ?? "0.00"}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFF6366F1),
                             fontWeight: FontWeight.w600,
                           ),
@@ -211,21 +211,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
 
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Quantity Selection
-                  Text(
+                  const Text(
                     'Bilet Adedi',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       border:
                           Border.all(color: Colors.grey[300] ?? Colors.grey),
@@ -234,7 +234,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.remove),
+                          icon: const Icon(Icons.remove),
                           onPressed: _quantity > 1
                               ? () => setState(() => _quantity--)
                               : null,
@@ -243,7 +243,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           child: Center(
                             child: Text(
                               '$_quantity',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -251,24 +251,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.add),
+                          icon: const Icon(Icons.add),
                           onPressed: () => setState(() => _quantity++),
                         ),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Payment Method
-                  Text(
+                  const Text(
                     'Ödeme Yöntemi',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
                       border:
@@ -278,29 +278,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Column(
                       children: [
                         _buildPaymentOption('credit_card', 'Kredi Kartı'),
-                        Divider(height: 0),
+                        const Divider(height: 0),
                         _buildPaymentOption('debit_card', 'Banka Kartı'),
-                        Divider(height: 0),
+                        const Divider(height: 0),
                         _buildPaymentOption('wallet', 'E-Cüzdan'),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Card Details (if credit card selected)
                   if (_paymentMethod.contains('card'))
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Kart Bilgileri',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         TextField(
                           controller: _cardNameController,
                           decoration: InputDecoration(
@@ -310,7 +310,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         TextField(
                           controller: _cardNumberController,
                           decoration: InputDecoration(
@@ -321,7 +321,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           keyboardType: TextInputType.number,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             Expanded(
@@ -335,7 +335,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: TextField(
                                 controller: _cardCvvController,
@@ -350,7 +350,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                       ],
                     ),
 
@@ -362,9 +362,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         onChanged: (value) {
                           setState(() => _agreeToTerms = value ?? false);
                         },
-                        activeColor: Color(0xFF6366F1),
+                        activeColor: const Color(0xFF6366F1),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           'Şart ve koşulları kabul ediyorum',
                           style: TextStyle(fontSize: 12),
@@ -373,16 +373,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ],
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Price Summary
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Color(0xFF6366F1).withOpacity(0.05),
+                      color: const Color(0xFF6366F1).withOpacity(0.05),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Color(0xFF6366F1).withOpacity(0.2),
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
                       ),
                     ),
                     child: Column(
@@ -390,31 +390,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Birim Fiyat:'),
+                            const Text('Birim Fiyat:'),
                             Text(
                               '₺${widget.event.price?.toStringAsFixed(2) ?? "0.00"}',
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Adet:'),
+                            const Text('Adet:'),
                             Text('$_quantity'),
                           ],
                         ),
-                        Divider(height: 16),
+                        const Divider(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               'Toplam:',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '₺${_totalPrice.toStringAsFixed(2)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF6366F1),
@@ -426,7 +426,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Pay Button
                   SizedBox(
@@ -435,13 +435,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: ElevatedButton(
                       onPressed: _isProcessing ? null : _processPayment,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF6366F1),
+                        backgroundColor: const Color(0xFF6366F1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: _isProcessing
-                          ? SizedBox(
+                          ? const SizedBox(
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
@@ -450,7 +450,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                               ),
                             )
-                          : Text(
+                          : const Text(
                               'Ödemeyi Tamamla',
                               style: TextStyle(
                                 color: Colors.white,
@@ -479,7 +479,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         }
       },
       title: Text(label),
-      activeColor: Color(0xFF6366F1),
+      activeColor: const Color(0xFF6366F1),
     );
   }
 }

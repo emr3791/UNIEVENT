@@ -1,47 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/app_drawer.dart';
+import '../providers/event_provider.dart';
+import '../providers/achievement_provider.dart';
+import '../widgets/avatar_widget.dart';
+import '../models/user.dart';
+
+// navigation destinations and helpers
+import 'chat_screen.dart';
+import 'favorites_screen.dart';
+import 'my_events_screen.dart';
+import 'achievements_screen.dart';
+import '../utils/animation_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _selectedCity = 'İstanbul';
-  List<String> _selectedInterests = [];
-
-  final List<String> _cities = ['İstanbul', 'Ankara', 'İzmir', 'Bursa'];
-  final List<String> _interests = [
-    'Etkinlikler',
-    'Konserler',
-    'Seminerler',
-    'Haberler'
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        backgroundColor: Color(0xFF6366F1),
-        elevation: 0,
-      ),
-      drawer: AppDrawer(),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           final user = authProvider.currentUser;
           return SingleChildScrollView(
             child: Column(
               children: [
-                // User Header
+                // Header Section
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(24),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(24),
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                       begin: Alignment.topLeft,
@@ -50,206 +43,183 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Text(
-                            (user?.username ?? 'K')[0].toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 44,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6366F1),
+                      AvatarWidget(
+                        user: user ??
+                            User(
+                              id: 'guest',
+                              email: '',
+                              username: '',
+                              fullName: 'Kullanıcı',
+                              userType: 'regular',
                             ),
-                          ),
-                        ),
+                        size: 80,
+                        showBorder: true,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       Text(
-                        user?.username ?? 'Kullanıcı',
-                        style: TextStyle(
+                        user?.fullName ?? user?.username ?? 'User',
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 4),
                       Text(
-                        user?.email ?? 'email@example.com',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          user?.userType == 'student'
-                              ? 'Öğrenci Hesabı'
-                              : 'Şirket Hesabı',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        user?.email ?? '',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
                 ),
 
+                // Content Section
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Preferences Section
-                      Text(
-                        'Tercihleriniz',
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        tileColor: Colors.white.withOpacity(0.08),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        title: const Text(
+                          'Kişisel Bilgilerim',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: const Text(
+                            'Gizli bilgilerinizi burada güvenli bir şekilde yönetin.'),
+                        trailing: Icon(Icons.chevron_right,
+                            color: Colors.white.withOpacity(0.6)),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/personal_info');
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Quick Links
+                      const Text(
+                        'Hızlı Bağlantılar',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 16),
-
-                      // City Selection
-                      Card(
-                        elevation: 0,
-                        color: Color(0xFF6366F1).withOpacity(0.05),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Şehrinizi Seçin',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                AnimationUtils.slideLeftTransition(
+                                  const ChatScreen(),
                                 ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black87,
+                              side: const BorderSide(
+                                  color: Color(0xFF6366F1), width: 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              SizedBox(height: 12),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Color(0xFF6366F1).withOpacity(0.3),
+                            ),
+                            child: const Text(
+                              '💬 Sohbet',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Consumer<EventProvider>(
+                            builder: (c, ep, _) => ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  AnimationUtils.slideLeftTransition(
+                                    const FavoritesScreen(),
                                   ),
-                                ),
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  underline: SizedBox(),
-                                  value: _selectedCity,
-                                  items: _cities.map((String city) {
-                                    return DropdownMenuItem<String>(
-                                      value: city,
-                                      child: Text(city),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCity = value!;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Interests Section
-                      Card(
-                        elevation: 0,
-                        color: Color(0xFF6366F1).withOpacity(0.05),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'İlgi Alanlarınız',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 12),
-                              ..._interests.map((interest) {
-                                return CheckboxListTile(
-                                  title: Text(interest),
-                                  value: _selectedInterests.contains(interest),
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        _selectedInterests.add(interest);
-                                      } else {
-                                        _selectedInterests.remove(interest);
-                                      }
-                                    });
-                                  },
-                                  activeColor: Color(0xFF6366F1),
-                                  contentPadding: EdgeInsets.zero,
                                 );
-                              }),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Save Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Tercihleriniz kaydedildi',
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black87,
+                                side: const BorderSide(
+                                    color: Color(0xFF6366F1), width: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor: Colors.green,
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF6366F1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              child: Text(
+                                '❤️ ${ep.favoriteEvents.length} Favori',
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
-                          child: Text(
-                            'Kaydet',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          Consumer<EventProvider>(
+                            builder: (c, ep, _) => ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  AnimationUtils.slideLeftTransition(
+                                    const MyEventsScreen(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black87,
+                                side: const BorderSide(
+                                    color: Color(0xFF6366F1), width: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                '📅 ${ep.myEvents.length} Katıldığım',
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
-                        ),
+                          Consumer<AchievementProvider>(
+                            builder: (c, ap, _) => ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  AnimationUtils.slideLeftTransition(
+                                    const AchievementsScreen(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black87,
+                                side: const BorderSide(
+                                    color: Color(0xFF6366F1), width: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                '🏆 ${ap.unlockedCount}/${ap.totalAchievements}',
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

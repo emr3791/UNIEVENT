@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/event_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/event_chat_provider.dart';
 import '../models/event.dart';
 import '../widgets/event_card.dart';
-import '../widgets/category_card.dart';
 import '../widgets/app_drawer.dart';
+import '../utils/animation_utils.dart';
+import 'event_chat_screen.dart';
+import 'profile_screen.dart';
+import 'search_screen.dart';
+import 'announcements_screen.dart';
+import 'event_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,41 +31,100 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    // Seçilen index'e göre body'yi değiştir
+    Widget bodyWidget;
+    AppBar? appBar;
+
+    if (_selectedIndex == 0) {
+      bodyWidget = const HomeContent();
+      appBar = AppBar(
         title: const Text('UniEventAI'),
         centerTitle: true,
-        backgroundColor: Color(0xFF6366F1),
+        backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              Navigator.pushNamed(context, '/search');
+              setState(() {
+                _selectedIndex = 1;
+              });
             },
           ),
         ],
-      ),
-      drawer: AppDrawer(),
-      body: const HomeContent(),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Ana Sayfa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Ara',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF6366F1),
-        onTap: _onItemTapped,
+      );
+    } else if (_selectedIndex == 1) {
+      bodyWidget = const SearchScreen();
+      appBar = AppBar(
+        title: const Text('Ara'),
+        backgroundColor: const Color(0xFF6366F1),
+        elevation: 0,
+      );
+    } else if (_selectedIndex == 2) {
+      bodyWidget = const AnnouncementsScreen();
+      appBar = AppBar(
+        title: const Text('Duyurular'),
+        backgroundColor: const Color(0xFF6366F1),
+        elevation: 0,
+      );
+    } else {
+      bodyWidget = const ProfileScreen();
+      appBar = AppBar(
+        title: const Text('Profil'),
+        backgroundColor: const Color(0xFF6366F1),
+        elevation: 0,
+      );
+    }
+
+    return Scaffold(
+      appBar: appBar,
+      drawer: const AppDrawer(),
+      body: bodyWidget,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Ana Sayfa',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search_outlined),
+              activeIcon: Icon(Icons.search),
+              label: 'Ara',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_outlined),
+              activeIcon: Icon(Icons.notifications),
+              label: 'Duyurular',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: const Color(0xFF6366F1),
+          unselectedItemColor: const Color(0xFF6366F1).withOpacity(0.4),
+          showUnselectedLabels: true,
+          selectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          unselectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
@@ -73,26 +138,23 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
+  bool _showWelcomeBanner = true;
   late Future<void> _loadFuture;
+  late final ScrollController _scrollController;
+  final GlobalKey _eventsSectionKey = GlobalKey();
   String _selectedCategory = 'all';
   final List<Map<String, dynamic>> categories = [
     {
       'id': 'all',
       'title': 'Tüm Etkinlikler',
       'icon': Icons.category,
-      'color': Color(0xFF6366F1),
+      'color': const Color(0xFF6366F1),
     },
     {
       'id': 'news',
       'title': 'Haberler',
       'icon': Icons.newspaper,
       'color': Colors.green,
-    },
-    {
-      'id': 'events',
-      'title': 'Etkinlikler',
-      'icon': Icons.event,
-      'color': Colors.orange,
     },
     {
       'id': 'concerts',
@@ -111,8 +173,44 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     final provider = Provider.of<EventProvider>(context, listen: false);
     _loadFuture = provider.loadEvents();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _selectCategory(String categoryId) {
+    setState(() => _selectedCategory = categoryId);
+    // Scroll to the events section so users see the filtered list.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_eventsSectionKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _eventsSectionKey.currentContext!,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  String _getCategoryLabel(String category) {
+    switch (category.toLowerCase()) {
+      case 'news':
+        return 'Haberler';
+      case 'concerts':
+        return 'Konserler';
+      case 'seminars':
+        return 'Seminerler';
+      case 'all':
+        return 'Tüm Etkinlikler';
+      default:
+        return category;
+    }
   }
 
   @override
@@ -121,97 +219,476 @@ class _HomeContentState extends State<HomeContent> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Welcome Header
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          if (_showWelcomeBanner)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Merhaba, ${authProvider.currentUser?.fullName ?? "Kullanıcı"}!',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Üniversite etkinliklerini keşfet',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          _showWelcomeBanner = false;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Merhaba, ${authProvider.currentUser?.username ?? "Kullanıcı"}!',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Üniversite etkinliklerini keşfet',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const SizedBox(height: 16),
 
-          // Categories
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kategoriler',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          // Announcements Section
+          Consumer<EventProvider>(
+            builder: (context, eventProvider, _) {
+              final announcements = eventProvider.events
+                  .where((e) => e.category.toLowerCase() == 'news')
+                  .take(3)
+                  .toList();
+              if (announcements.isEmpty) return const SizedBox.shrink();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Text(
+                      '🔥 Önemli Duyurular',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return CategoryCard(
-                      title: category['title'],
-                      icon: category['icon'],
-                      color: category['color'],
-                      onTap: () {
-                        setState(() => _selectedCategory = category['id']);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${category['title']} kategorisi seçildi',
+                  SizedBox(
+                    height: 120,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: announcements.length,
+                      itemBuilder: (context, index) {
+                        final announcement = announcements[index];
+                        return Container(
+                          width: 280,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.orange.shade400,
+                                Colors.deepOrange
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            duration: Duration(seconds: 1),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  AnimationUtils.slideLeftTransition(
+                                    EventDetailScreen(event: announcement),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        'YENİ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      announcement.title,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       },
-                    );
-                  },
-                ),
-              ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            },
+          ),
+
+          // Animated Stacked Category Cards
+          SizedBox(
+            height: 140,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final isSelected = _selectedCategory == category['id'];
+                final color = category['color'] as Color;
+                return GestureDetector(
+                  onTap: () => _selectCategory(category['id']),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOut,
+                    margin: const EdgeInsets.only(right: 12),
+                    child: SizedBox(
+                      width: 130,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Back card 2
+                          Positioned(
+                            top: 4,
+                            left: 8,
+                            right: 0,
+                            child: Container(
+                              height: 130,
+                              width: 115,
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                          ),
+                          // Back card 1
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            right: 4,
+                            child: Container(
+                              height: 130,
+                              width: 110,
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                          ),
+                          // Front card
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: isSelected
+                                    ? [color, color.withOpacity(0.7)]
+                                    : [
+                                        color.withOpacity(0.85),
+                                        color.withOpacity(0.6)
+                                      ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      color.withOpacity(isSelected ? 0.5 : 0.2),
+                                  blurRadius: isSelected ? 16 : 8,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  scale: isSelected ? 1.15 : 1.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.25),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      category['icon'] as IconData,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  category['title'] as String,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                if (isSelected)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 6),
+                                    width: 24,
+                                    height: 3,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
+
+          // Active Category Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              _selectedCategory == 'all'
+                  ? 'Tüm Etkinlikler'
+                  : 'Kategori: ${_getCategoryLabel(_selectedCategory)}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Upcoming events (filtered by selected category)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Consumer<EventProvider>(
+              builder: (context, eventProvider, _) {
+                final upcomingEvents = eventProvider
+                    .getUpcomingEvents()
+                    .where((event) => _selectedCategory == 'all'
+                        ? true
+                        : event.category.toLowerCase() == _selectedCategory)
+                    .take(3)
+                    .toList();
+                return upcomingEvents.isEmpty
+                    ? Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Seçili kategoride yaklaşan etkinlik yok',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: upcomingEvents.length,
+                        itemBuilder: (context, index) {
+                          final event = upcomingEvents[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color:
+                                    const Color(0xFF6366F1).withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color: const Color(0xFF6366F1)
+                                        .withOpacity(0.2)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.calendar_today,
+                                      color: Color(0xFF6366F1), size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          event.title,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          '${event.date.day}/${event.date.month}/${event.date.year}',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.grey[600]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Consumer<EventProvider>(
+                                    builder: (context, eventProvider, _) {
+                                      final isJoined =
+                                          eventProvider.isJoined(event.id);
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (isJoined)
+                                            IconButton(
+                                              icon: const Icon(
+                                                  Icons.chat_bubble,
+                                                  color: Color(0xFF6366F1),
+                                                  size: 20),
+                                              padding: EdgeInsets.zero,
+                                              constraints:
+                                                  const BoxConstraints(),
+                                              tooltip: 'Etkinlik Sohbeti',
+                                              onPressed: () {
+                                                final chatProvider = Provider
+                                                    .of<EventChatProvider>(
+                                                        context,
+                                                        listen: false);
+                                                final authUser =
+                                                    Provider.of<AuthProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .currentUser;
+                                                chatProvider.joinEvent(
+                                                    event.id,
+                                                    event.title,
+                                                    authUser?.id ?? 'guest');
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          EventChatScreen(
+                                                              eventId: event.id,
+                                                              eventTitle:
+                                                                  event.title),
+                                                    ));
+                                              },
+                                            ),
+                                          const SizedBox(width: 4),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              if (isJoined) {
+                                                eventProvider
+                                                    .unjoinEvent(event.id);
+                                              } else {
+                                                eventProvider
+                                                    .joinEvent(event.id);
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: isJoined
+                                                  ? Colors.orange
+                                                  : const Color(0xFF6366F1),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
+                                            ),
+                                            child: Text(
+                                              isJoined ? 'Katıldı' : 'Katıl',
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 8),
 
           // Events Section
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
+            key: _eventsSectionKey,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: const Text(
               'Etkinlikler',
               style: TextStyle(
                 fontSize: 18,
@@ -219,7 +696,7 @@ class _HomeContentState extends State<HomeContent> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -228,7 +705,7 @@ class _HomeContentState extends State<HomeContent> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting ||
                     eventProvider.isLoading) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(
                       color: Color(0xFF6366F1),
                     ),
@@ -237,14 +714,14 @@ class _HomeContentState extends State<HomeContent> {
 
                 if (eventProvider.error != null) {
                   return Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'Hata: ${eventProvider.error}',
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                     ),
                   );
                 }
@@ -262,7 +739,7 @@ class _HomeContentState extends State<HomeContent> {
 
                 if (displayedEvents.isEmpty) {
                   return Container(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
                         Icon(
@@ -270,7 +747,7 @@ class _HomeContentState extends State<HomeContent> {
                           size: 64,
                           color: Colors.grey[300],
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'Bu kategoride etkinlik bulunamadı',
                           style: TextStyle(
@@ -285,19 +762,21 @@ class _HomeContentState extends State<HomeContent> {
 
                 return ListView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: displayedEvents.length,
                   itemBuilder: (context, index) {
                     final event = displayedEvents[index];
                     return Padding(
-                      padding: EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.only(bottom: 16),
                       child: EventCard(
                         event: event,
+                        participantCount:
+                            eventProvider.getParticipantCount(event.id),
                         onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/event_detail',
-                            arguments: event,
+                          Navigator.of(context).push(
+                            AnimationUtils.slideLeftTransition(
+                              EventDetailScreen(event: event),
+                            ),
                           );
                         },
                         onBuyTap: () {
@@ -314,7 +793,7 @@ class _HomeContentState extends State<HomeContent> {
               },
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
         ],
       ),
     );

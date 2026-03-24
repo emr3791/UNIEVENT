@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/event.dart';
+import '../providers/auth_provider.dart';
+import '../providers/event_provider.dart';
+import '../providers/notification_provider.dart';
 import '../widgets/app_drawer.dart';
 
 class EventDetailScreen extends StatelessWidget {
-  const EventDetailScreen({super.key});
+  final Event event;
+
+  const EventDetailScreen({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
-    final Event event = ModalRoute.of(context)!.settings.arguments as Event;
     final dateFormat = DateFormat('EEEE, dd MMMM yyyy HH:mm', 'tr_TR');
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
 
     return Scaffold(
+      
       appBar: AppBar(
-        title: Text('Etkinlik Detayları'),
-        backgroundColor: Color(0xFF6366F1),
+        title: const Text('Etkinlik Detayları'),
+        backgroundColor: const Color(0xFF6366F1),
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +42,8 @@ class EventDetailScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: Color(0xFF6366F1).withOpacity(0.2),
-                        child: Icon(
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        child: const Icon(
                           Icons.event,
                           size: 80,
                           color: Color(0xFF6366F1),
@@ -47,15 +55,15 @@ class EventDetailScreen extends StatelessWidget {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: _getCategoryColor(event.category),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         _getCategoryLabel(event.category),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -68,43 +76,43 @@ class EventDetailScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title
                   Text(
                     event.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Rating and Attendees
                   if (event.attendees != null)
                     Row(
                       children: [
                         Icon(Icons.people, size: 18, color: Colors.grey[600]),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
                           '${event.attendees} kişi katılacak',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ],
                     ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Info Cards
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Color(0xFF6366F1).withOpacity(0.05),
+                      color: const Color(0xFF6366F1).withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Color(0xFF6366F1).withOpacity(0.2),
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
                       ),
                     ),
                     child: Column(
@@ -114,26 +122,26 @@ class EventDetailScreen extends StatelessWidget {
                           label: 'Tarih & Saat',
                           value: dateFormat.format(event.date),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         _buildInfoRow(
                           icon: Icons.location_on,
                           label: 'Yer',
                           value: event.location,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         _buildInfoRow(
                           icon: Icons.school,
                           label: 'Üniversite',
                           value: event.university,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         _buildInfoRow(
                           icon: Icons.place,
                           label: 'Şehir',
                           value: event.city,
                         ),
                         if (event.speaker != null) ...[
-                          SizedBox(height: 12),
+                          const SizedBox(height: 12),
                           _buildInfoRow(
                             icon: Icons.person,
                             label: 'Konuşmacı',
@@ -144,17 +152,17 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Description
-                  Text(
+                  const Text(
                     'Etkinlik Hakkında',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     event.description,
                     style: TextStyle(
@@ -164,37 +172,37 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Price and Button
                   if (event.price != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Fiyat',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Container(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Color(0xFF6366F1).withOpacity(0.1),
+                            color: const Color(0xFF6366F1).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 'Bilet Fiyatı',
                                 style: TextStyle(fontSize: 16),
                               ),
                               Text(
                                 '₺${event.price!.toStringAsFixed(2)}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF6366F1),
@@ -203,7 +211,7 @@ class EventDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                       ],
                     ),
 
@@ -211,50 +219,194 @@ class EventDetailScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
+                        child: Consumer<EventProvider>(
+                          builder: (context, eventProvider, _) {
+                            final isFavorite =
+                                eventProvider.isFavorite(event.id);
+                            return OutlinedButton.icon(
+                              onPressed: () {
+                                eventProvider.toggleFavorite(event.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isFavorite
+                                        ? 'Favorilerden çıkarıldı'
+                                        : 'Favorilere eklendi'),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              icon: Icon(isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border),
+                              label:
+                                  Text(isFavorite ? 'Favorilerde' : 'Favori'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: isFavorite
+                                    ? Colors.red
+                                    : const Color(0xFF6366F1),
+                                side: BorderSide(
+                                    color: isFavorite
+                                        ? Colors.red
+                                        : const Color(0xFF6366F1)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Consumer<EventProvider>(
+                          builder: (context, eventProvider, _) {
+                            final restrictionMessage = eventProvider
+                                .joinRestrictionMessage(event, user);
+                            final isJoined = eventProvider.isJoined(event.id);
+                            final canJoin = restrictionMessage == null;
+
+                            return ElevatedButton.icon(
+                              onPressed: canJoin
+                                  ? () {
+                                      if (isJoined) {
+                                        eventProvider.unjoinEvent(event.id);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Etkinlikten ayrıldınız'),
+                                              backgroundColor: Colors.orange),
+                                        );
+                                      } else {
+                                        eventProvider.joinEvent(event.id);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content:
+                                                  Text('Etkinliğe katıldınız'),
+                                              backgroundColor: Colors.green),
+                                        );
+                                      }
+                                    }
+                                  : null,
+                              icon: Icon(isJoined ? Icons.check : Icons.add),
+                              label: Text(isJoined ? 'Ayrıl' : 'Katıl'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isJoined
+                                    ? Colors.orange
+                                    : const Color(0xFF6366F1),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Consumer2<EventProvider, NotificationProvider>(
+                          builder: (context, eventProvider,
+                              notificationProvider, _) {
+                            final isReminder =
+                                eventProvider.isReminderSet(event.id);
+                            return OutlinedButton.icon(
+                              onPressed: () {
+                                eventProvider.toggleReminder(event.id);
+                                if (!isReminder) {
+                                  final daysLeft = event.date
+                                      .difference(DateTime.now())
+                                      .inDays;
+                                  final reminderContent = daysLeft > 0
+                                      ? '$daysLeft gün sonra bu etkinlik gerçekleşecek! Katılmak istiyorsan yerini ayırtmayı unutma.'
+                                      : 'Bu etkinlik çok yakında gerçekleşecek! Katılmak istiyorsan acele et.';
+
+                                  notificationProvider.addNotification(
+                                    title: 'Hatırlatma Kuruldu',
+                                    message: reminderContent,
+                                    type: NotificationType.reminder,
+                                  );
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isReminder
+                                        ? 'Hatırlatıcı iptal edildi'
+                                        : 'Hatırlatıcı ayarlandı'),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              icon: Icon(isReminder
+                                  ? Icons.notifications_off
+                                  : Icons.notifications_active),
+                              label: Text(isReminder
+                                  ? 'Hatırlatmayı Kapat'
+                                  : 'Hatırlat'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: isReminder
+                                    ? Colors.grey[800]
+                                    : const Color(0xFF6366F1),
+                                side: BorderSide(
+                                  color: isReminder
+                                      ? Colors.grey
+                                      : const Color(0xFF6366F1),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      CircleAvatar(
+                        backgroundColor: const Color(0xFF6366F1),
+                        child: IconButton(
+                          icon: const Icon(Icons.share, color: Colors.white),
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Etkinlik kaydedildi'),
+                              const SnackBar(
+                                content: Text('Paylaşım linki kopyalandı'),
                                 duration: Duration(seconds: 1),
                               ),
                             );
                           },
-                          icon: Icon(Icons.bookmark),
-                          label: Text('Kaydet'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Color(0xFF6366F1),
-                            side: BorderSide(color: Color(0xFF6366F1)),
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/payment',
-                              arguments: event,
-                            );
-                          },
-                          icon: Icon(Icons.shopping_cart),
-                          label: Text('Bilet Al'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF6366F1),
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                          ),
                         ),
                       ),
                     ],
                   ),
 
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+
+                  // Join restriction note
+                  Consumer<EventProvider>(
+                    builder: (context, eventProvider, _) {
+                      final restrictionMessage =
+                          eventProvider.joinRestrictionMessage(event, user);
+                      if (restrictionMessage == null) {
+                        return const SizedBox.shrink();
+                      }
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              Border.all(color: Colors.red.withOpacity(0.2)),
+                        ),
+                        child: Text(
+                          restrictionMessage,
+                          style:
+                              TextStyle(color: Colors.red[800], fontSize: 12),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
 
                   // Additional Info
                   Container(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(8),
@@ -263,21 +415,21 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info, color: Colors.blue, size: 20),
-                        SizedBox(width: 12),
+                        const Icon(Icons.info, color: Colors.blue, size: 20),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             event.isOpenToExternal
                                 ? 'Bu etkinlik dışarıdan katılıma açıktır'
                                 : 'Bu etkinlik sadece İç katılımcılara açıktır',
-                            style: TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -294,8 +446,8 @@ class EventDetailScreen extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, color: Color(0xFF6366F1), size: 24),
-        SizedBox(width: 16),
+        Icon(icon, color: const Color(0xFF6366F1), size: 24),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,10 +459,10 @@ class EventDetailScreen extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
@@ -334,7 +486,7 @@ class EventDetailScreen extends StatelessWidget {
       case 'events':
         return Colors.orange;
       default:
-        return Color(0xFF6366F1);
+        return const Color(0xFF6366F1);
     }
   }
 

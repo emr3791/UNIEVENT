@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/app_logo.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -16,22 +17,16 @@ class AppDrawer extends StatelessWidget {
               final user = authProvider.currentUser;
               return UserAccountsDrawerHeader(
                 accountName: Text(
-                  user?.username ?? 'Konuk Kullanıcı',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  user?.fullName ?? user?.username ?? 'Konuk Kullanıcı',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 accountEmail: Text(user?.email ?? 'guest@unievent.com'),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Color(0xFF6366F1),
-                  child: Text(
-                    (user?.username ?? 'G')[0].toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                currentAccountPicture: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: AppLogo(
+                      size: 32, showText: false, color: Color(0xFF6366F1)),
                 ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                     begin: Alignment.topLeft,
@@ -55,16 +50,7 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/home');
                   },
                 ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.school,
-                  title: 'Üniversiteler',
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/universities');
-                  },
-                ),
-                Divider(height: 24, indent: 16, endIndent: 16),
+                const Divider(height: 24, indent: 16, endIndent: 16),
                 _buildDrawerItem(
                   context,
                   icon: Icons.info,
@@ -85,6 +71,15 @@ class AppDrawer extends StatelessWidget {
                 ),
                 _buildDrawerItem(
                   context,
+                  icon: Icons.settings,
+                  title: 'Ayarlar',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/settings');
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
                   icon: Icons.contact_mail,
                   title: 'İletişim',
                   onTap: () {
@@ -95,7 +90,7 @@ class AppDrawer extends StatelessWidget {
               ],
             ),
           ),
-          Divider(),
+          const Divider(),
           // Logout Button
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -115,7 +110,7 @@ class AppDrawer extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Çıkış Yap',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -136,7 +131,7 @@ class AppDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Color(0xFF6366F1)),
+      leading: Icon(icon, color: const Color(0xFF6366F1)),
       title: Text(title),
       onTap: onTap,
     );
@@ -146,8 +141,8 @@ class AppDrawer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Hakkında'),
-        content: SingleChildScrollView(
+        title: const Text('Hakkında'),
+        content: const SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -177,7 +172,7 @@ class AppDrawer extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Kapat'),
+            child: const Text('Kapat'),
           ),
         ],
       ),
@@ -188,34 +183,34 @@ class AppDrawer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Geliştirici Ekibi'),
+        title: const Text('Geliştirici Ekibi'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildDeveloperCard(
-                name: 'Ahmet Yılmaz',
+                name: 'ŞEVVAL DAĞ',
                 role: 'Lead Developer',
-                email: 'ahmet.yilmaz@unievent.com',
+                email: 'sevval.dag@unievent.com',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildDeveloperCard(
-                name: 'Fatma Demir',
+                name: 'ESAD ARDA BÜKECİK',
                 role: 'UI/UX Designer',
-                email: 'fatma.demir@unievent.com',
+                email: 'esad.bukecik@unievent.com',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildDeveloperCard(
-                name: 'Mehmet Kaya',
+                name: 'EMİN ALKIŞ',
                 role: 'Backend Developer',
-                email: 'mehmet.kaya@unievent.com',
+                email: 'emin.alkis@unievent.com',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildDeveloperCard(
-                name: 'Ayşe Türk',
+                name: 'EMRULLAH YILDIZ',
                 role: 'AI/ML Specialist',
-                email: 'ayse.turk@unievent.com',
+                email: 'emrullah.yildiz@unievent.com',
               ),
             ],
           ),
@@ -223,7 +218,7 @@ class AppDrawer extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Kapat'),
+            child: const Text('Kapat'),
           ),
         ],
       ),
@@ -236,9 +231,9 @@ class AppDrawer extends StatelessWidget {
     required String email,
   }) {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFF6366F1).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -246,17 +241,17 @@ class AppDrawer extends StatelessWidget {
         children: [
           Text(
             name,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             role,
-            style: TextStyle(fontSize: 12, color: Color(0xFF6366F1)),
+            style: const TextStyle(fontSize: 12, color: Color(0xFF6366F1)),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             email,
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
@@ -267,7 +262,7 @@ class AppDrawer extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('İletişim Bilgileri'),
+        title: const Text('İletişim Bilgileri'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,30 +273,30 @@ class AppDrawer extends StatelessWidget {
                 label: 'E-posta',
                 value: 'info@unievent.com.tr',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildContactItem(
                 icon: Icons.phone,
                 label: 'Telefon',
                 value: '+90 (212) 555-1234',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildContactItem(
                 icon: Icons.location_on,
                 label: 'Adres',
                 value: 'İstanbul, Türkiye',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildContactItem(
                 icon: Icons.language,
                 label: 'Web Sitesi',
                 value: 'www.unievent.com.tr',
               ),
-              SizedBox(height: 24),
-              Text(
+              const SizedBox(height: 24),
+              const Text(
                 'Sosyal Medya',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -316,7 +311,7 @@ class AppDrawer extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Kapat'),
+            child: const Text('Kapat'),
           ),
         ],
       ),
@@ -330,20 +325,20 @@ class AppDrawer extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, color: Color(0xFF6366F1), size: 20),
-        SizedBox(width: 12),
+        Icon(icon, color: const Color(0xFF6366F1), size: 20),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -360,14 +355,14 @@ class AppDrawer extends StatelessWidget {
           height: 44,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFF6366F1).withOpacity(0.1),
+            color: const Color(0xFF6366F1).withOpacity(0.1),
           ),
-          child: Icon(icon, color: Color(0xFF6366F1), size: 20),
+          child: Icon(icon, color: const Color(0xFF6366F1), size: 20),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 10),
+          style: const TextStyle(fontSize: 10),
           textAlign: TextAlign.center,
         ),
       ],

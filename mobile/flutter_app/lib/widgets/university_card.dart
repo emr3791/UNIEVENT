@@ -22,7 +22,7 @@ class UniversityCard extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -38,8 +38,8 @@ class UniversityCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Color(0xFF6366F1).withOpacity(0.2),
-                      child: Icon(
+                      color: const Color(0xFF6366F1).withOpacity(0.2),
+                      child: const Icon(
                         Icons.school,
                         size: 48,
                         color: Color(0xFF6366F1),
@@ -69,13 +69,13 @@ class UniversityCard extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         university.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -83,18 +83,18 @@ class UniversityCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.location_on,
+                              const Icon(Icons.location_on,
                                   size: 14, color: Colors.white70),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
                                 university.city,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.white70,
                                 ),
@@ -104,11 +104,11 @@ class UniversityCard extends StatelessWidget {
                           if (university.rating != null)
                             Row(
                               children: [
-                                Icon(Icons.star, size: 14, color: Colors.amber),
-                                SizedBox(width: 2),
+                                const Icon(Icons.star, size: 14, color: Colors.amber),
+                                const SizedBox(width: 2),
                                 Text(
                                   '${university.rating}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600,

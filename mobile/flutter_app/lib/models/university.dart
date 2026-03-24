@@ -8,7 +8,7 @@ class University {
   final int? studentCount;
   final List<String>? eventIds;
 
-  University({
+  const University({
     required this.id,
     required this.name,
     required this.city,

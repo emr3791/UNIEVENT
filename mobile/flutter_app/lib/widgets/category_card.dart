@@ -5,6 +5,7 @@ class CategoryCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final bool isSelected;
 
   const CategoryCard({
     Key? key,
@@ -12,6 +13,7 @@ class CategoryCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.isSelected = false,
   }) : super(key: key);
 
   @override
@@ -20,9 +22,21 @@ class CategoryCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: isSelected ? color.withOpacity(0.25) : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+          border: Border.all(
+            color: isSelected ? color : color.withOpacity(0.3),
+            width: isSelected ? 2 : 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -32,15 +46,17 @@ class CategoryCard extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withOpacity(0.2),
+                color: isSelected
+                    ? color.withOpacity(0.35)
+                    : color.withOpacity(0.2),
               ),
               child: Icon(icon, color: color, size: 32),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,

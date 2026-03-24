@@ -6,12 +6,14 @@ class EventCard extends StatelessWidget {
   final Event event;
   final VoidCallback onTap;
   final VoidCallback? onBuyTap;
+  final int participantCount;
 
   const EventCard({
     Key? key,
     required this.event,
     required this.onTap,
     this.onBuyTap,
+    this.participantCount = 0,
   }) : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class EventCard extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -48,8 +50,8 @@ class EventCard extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: Color(0xFF6366F1).withOpacity(0.2),
-                        child: Icon(
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        child: const Icon(
                           Icons.event,
                           size: 48,
                           color: Color(0xFF6366F1),
@@ -57,13 +59,49 @@ class EventCard extends StatelessWidget {
                       );
                     },
                   ),
+                  // Participant Count Badge
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF6366F1).withOpacity(0.8),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.people,
+                            size: 12,
+                            color: Color(0xFF6366F1),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Katılım: $participantCount',
+                            style: const TextStyle(
+                              color: Color(0xFF6366F1),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   // Category Badge
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color:
                             _getCategoryColor(event.category).withOpacity(0.9),
@@ -71,7 +109,7 @@ class EventCard extends StatelessWidget {
                       ),
                       child: Text(
                         _getCategoryLabel(event.category),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -84,13 +122,13 @@ class EventCard extends StatelessWidget {
             ),
             // Content
             Padding(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     event.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -98,12 +136,12 @@ class EventCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Icon(Icons.calendar_today,
                           size: 13, color: Colors.grey[600]),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           dateFormat.format(event.date),
@@ -117,12 +155,12 @@ class EventCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
                       Icon(Icons.location_on,
                           size: 13, color: Colors.grey[600]),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           event.location,
@@ -136,7 +174,7 @@ class EventCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   // Bottom row with price and button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -144,7 +182,7 @@ class EventCard extends StatelessWidget {
                       if (event.price != null)
                         Text(
                           '₺${event.price!.toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF6366F1),
@@ -153,8 +191,8 @@ class EventCard extends StatelessWidget {
                       ElevatedButton(
                         onPressed: onBuyTap,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF6366F1),
-                          padding: EdgeInsets.symmetric(
+                          backgroundColor: const Color(0xFF6366F1),
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 8,
                           ),
@@ -162,7 +200,7 @@ class EventCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Bilet Al',
                           style: TextStyle(
                             color: Colors.white,
@@ -193,7 +231,7 @@ class EventCard extends StatelessWidget {
       case 'events':
         return Colors.orange;
       default:
-        return Color(0xFF6366F1);
+        return const Color(0xFF6366F1);
     }
   }
 

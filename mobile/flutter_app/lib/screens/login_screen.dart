@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/app_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -58,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
             begin: Alignment.topLeft,
@@ -72,44 +73,17 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40),
-                  // Logo/Title
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                  const SizedBox(height: 20),
+                  const AppLogo(size: 80, showText: true),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Üniversite etkinliklerini keşfet',
+                    style: TextStyle(
+                      fontSize: 16,
                       color: Colors.white.withOpacity(0.9),
                     ),
-                    child: Center(
-                      child: Text(
-                        'UNI',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF6366F1),
-                        ),
-                      ),
-                    ),
                   ),
-                  SizedBox(height: 32),
-                  Text(
-                    'UniEvent AI',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Üniversite Etkinliklerini Keşfet',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.8),
-                    ),
-                  ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 48),
 
                   // Login Type Toggle
                   Container(
@@ -117,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(4),
                     child: Row(
                       children: [
                         Expanded(
@@ -130,13 +104,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Text(
                                 'Öğrenci Girişi',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _isStudentLogin
-                                      ? Color(0xFF6366F1)
+                                      ? const Color(0xFF6366F1)
                                       : Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -155,13 +129,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Text(
-                                'Şirket Girişi',
+                                'Diğer Kullanıcı',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: !_isStudentLogin
-                                      ? Color(0xFF6366F1)
+                                      ? const Color(0xFF6366F1)
                                       : Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -172,12 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Email Input
                   TextField(
                     controller: _emailController,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: _isStudentLogin
                           ? 'Öğrenci E-postası (örn: ogrenci@student.edu.tr)'
@@ -185,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                       ),
-                      prefixIcon: Icon(Icons.email, color: Colors.white),
+                      prefixIcon: const Icon(Icons.email, color: Colors.white),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.1),
                       border: OutlineInputBorder(
@@ -195,19 +169,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Password Input
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Şifre',
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                       ),
-                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      prefixIcon: const Icon(Icons.lock, color: Colors.white),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.1),
                       border: OutlineInputBorder(
@@ -216,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Login Button
                   Consumer<AuthProvider>(
@@ -235,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           child: authProvider.isLoading
-                              ? SizedBox(
+                              ? const SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
@@ -245,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   'Giriş Yap',
                                   style: TextStyle(
                                     color: Color(0xFF6366F1),
@@ -257,15 +231,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+
+                  // Sign Up Link
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Hesabın yok mu? ',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: const Text(
+                          'Kayıt Ol',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
                   // Guest Login
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/home');
                     },
-                    child: Text(
-                      'Konuk Olarak Devam Et',
+                    child: const Text(
+                      'Misafir Girişi',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,

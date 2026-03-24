@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/event_provider.dart';
 import '../models/university.dart';
-import '../models/event.dart';
 import '../widgets/event_card.dart';
 import '../widgets/app_drawer.dart';
+import '../utils/animation_utils.dart';
+import 'event_detail_screen.dart';
 
 class UniversityDetailScreen extends StatefulWidget {
   final University university;
@@ -34,10 +35,10 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.university.name),
-        backgroundColor: Color(0xFF6366F1),
+        backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,8 +57,8 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: Color(0xFF6366F1).withOpacity(0.2),
-                        child: Icon(
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        child: const Icon(
                           Icons.school,
                           size: 80,
                           color: Color(0xFF6366F1),
@@ -88,24 +89,24 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                       children: [
                         Text(
                           widget.university.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.location_on,
+                                const Icon(Icons.location_on,
                                     color: Colors.white, size: 18),
-                                SizedBox(width: 6),
+                                const SizedBox(width: 6),
                                 Text(
                                   widget.university.city,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
                                   ),
@@ -115,12 +116,12 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                             if (widget.university.rating != null)
                               Row(
                                 children: [
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Colors.amber, size: 18),
-                                  SizedBox(width: 4),
+                                  const SizedBox(width: 4),
                                   Text(
                                     '${widget.university.rating}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -138,7 +139,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
 
             // Info Cards
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Expanded(
@@ -150,7 +151,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                           : 'N/A',
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildInfoCard(
                       icon: Icons.event,
@@ -165,18 +166,18 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
             // Description
             if (widget.university.description != null)
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Hakkında',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       widget.university.description!,
                       style: TextStyle(
@@ -184,7 +185,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                         height: 1.5,
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -194,14 +195,14 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
               height: 50,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   final category = categories[index];
                   final isSelected = _selectedCategory == category;
 
                   return Padding(
-                    padding: EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
                       selected: isSelected,
                       onSelected: (selected) {
@@ -209,7 +210,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                       },
                       label: Text(categoryLabels[category]!),
                       backgroundColor: Colors.grey[100],
-                      selectedColor: Color(0xFF6366F1),
+                      selectedColor: const Color(0xFF6366F1),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w600,
@@ -219,11 +220,11 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Events List
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Consumer<EventProvider>(
                 builder: (context, eventProvider, _) {
                   var events = eventProvider.events
@@ -245,7 +246,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
 
                   if (events.isEmpty) {
                     return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
+                      padding: const EdgeInsets.symmetric(vertical: 32),
                       child: Center(
                         child: Column(
                           children: [
@@ -254,7 +255,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                               size: 64,
                               color: Colors.grey[300],
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             Text(
                               'Bu kategoride etkinlik bulunamadı',
                               style: TextStyle(
@@ -270,19 +271,21 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
 
                   return ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: events.length,
                     itemBuilder: (context, index) {
                       final event = events[index];
                       return Padding(
-                        padding: EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.only(bottom: 16),
                         child: EventCard(
                           event: event,
+                          participantCount:
+                              eventProvider.getParticipantCount(event.id),
                           onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/event_detail',
-                              arguments: event,
+                            Navigator.of(context).push(
+                              AnimationUtils.slideLeftTransition(
+                                EventDetailScreen(event: event),
+                              ),
                             );
                           },
                           onBuyTap: () {
@@ -299,7 +302,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                 },
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -312,27 +315,27 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
     required String value,
   }) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF6366F1).withOpacity(0.1),
+        color: const Color(0xFF6366F1).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Color(0xFF6366F1).withOpacity(0.3),
+          color: const Color(0xFF6366F1).withOpacity(0.3),
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Color(0xFF6366F1), size: 28),
-          SizedBox(height: 8),
+          Icon(icon, color: const Color(0xFF6366F1), size: 28),
+          const SizedBox(height: 8),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF6366F1),
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(

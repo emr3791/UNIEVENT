@@ -32,16 +32,16 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
       appBar: AppBar(
         title: const Text('Üniversiteler'),
         centerTitle: true,
-        backgroundColor: Color(0xFF6366F1),
+        backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           // Search and Filter
           Container(
-            padding: EdgeInsets.all(16),
-            color: Color(0xFF6366F1).withOpacity(0.05),
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFF6366F1).withOpacity(0.05),
             child: Column(
               children: [
                 // Search Box
@@ -49,7 +49,7 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Üniversite adı ara...',
-                    prefixIcon: Icon(Icons.search, color: Color(0xFF6366F1)),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF6366F1)),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -59,18 +59,18 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                   ),
                   onChanged: (value) => setState(() {}),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 // Add University Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => _showAddUniversityDialog(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF6366F1),
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: const Color(0xFF6366F1),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    icon: Icon(Icons.add),
-                    label: Text(
+                    icon: const Icon(Icons.add),
+                    label: const Text(
                       'Üniversite Ekle',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
@@ -110,7 +110,7 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                           size: 64,
                           color: Colors.grey[300],
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           _searchController.text.isEmpty
                               ? 'Hiç üniversite yok'
@@ -126,8 +126,8 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                 }
 
                 return GridView.builder(
-                  padding: EdgeInsets.all(16),
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 200,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
@@ -157,20 +157,20 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
   }
 
   void _showAddUniversityDialog(BuildContext context) {
-    final _nameController = TextEditingController();
-    final _cityController = TextEditingController();
-    final _descriptionController = TextEditingController();
+    final nameController = TextEditingController();
+    final cityController = TextEditingController();
+    final descriptionController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Üniversite Ekle'),
+        title: const Text('Üniversite Ekle'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _nameController,
+                controller: nameController,
                 decoration: InputDecoration(
                   hintText: 'Üniversite Adı',
                   border: OutlineInputBorder(
@@ -178,9 +178,9 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextField(
-                controller: _cityController,
+                controller: cityController,
                 decoration: InputDecoration(
                   hintText: 'Şehir',
                   border: OutlineInputBorder(
@@ -188,9 +188,9 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextField(
-                controller: _descriptionController,
+                controller: descriptionController,
                 decoration: InputDecoration(
                   hintText: 'Açıklama',
                   border: OutlineInputBorder(
@@ -205,14 +205,14 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('İptal'),
+            child: const Text('İptal'),
           ),
           ElevatedButton(
             onPressed: () async {
-              if (_nameController.text.isEmpty ||
-                  _cityController.text.isEmpty) {
+              if (nameController.text.isEmpty ||
+                  cityController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Lütfen tüm alanları doldurun'),
                     backgroundColor: Colors.red,
                   ),
@@ -226,15 +226,15 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
               );
 
               await universityProvider.addUniversity(
-                name: _nameController.text,
-                city: _cityController.text,
-                description: _descriptionController.text,
+                name: nameController.text,
+                city: cityController.text,
+                description: descriptionController.text,
               );
 
               if (mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Üniversite başarıyla eklendi'),
                     backgroundColor: Colors.green,
                   ),
@@ -242,9 +242,9 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF6366F1),
+              backgroundColor: const Color(0xFF6366F1),
             ),
-            child: Text(
+            child: const Text(
               'Ekle',
               style: TextStyle(color: Colors.white),
             ),
