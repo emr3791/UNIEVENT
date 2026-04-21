@@ -16,7 +16,7 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.1.14
   shared_preferences: ^2.1.0
-  image_picker: ^0.8.7+4
+  image_picker: ^1.2.1
   google_nav_bar: ^5.0.7
   google_fonts: ^8.0.2
   line_icons: ^2.0.3
@@ -37,4 +37,4 @@ flutter:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
