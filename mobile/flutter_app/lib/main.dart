@@ -35,7 +35,7 @@ void main() {
 }
 
 class UniEventApp extends StatelessWidget {
-  const UniEventApp({Key? key}) : super(key: key);
+  const UniEventApp({super.key});
 
   @override
   Widget build(BuildContext context) {

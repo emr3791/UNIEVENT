@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ShaderBackground extends StatefulWidget {
   final Widget? child;
-  const ShaderBackground({Key? key, this.child}) : super(key: key);
+  const ShaderBackground({super.key, this.child});
 
   @override
   State<ShaderBackground> createState() => _ShaderBackgroundState();

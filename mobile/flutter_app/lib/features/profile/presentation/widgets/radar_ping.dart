@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 class RadarPing extends StatefulWidget {
   final Widget child;
-  const RadarPing({Key? key, required this.child}) : super(key: key);
+  const RadarPing({super.key, required this.child});
 
   @override
   State<RadarPing> createState() => _RadarPingState();

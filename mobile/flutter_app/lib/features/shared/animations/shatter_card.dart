@@ -7,10 +7,10 @@ class ShatterCard extends StatefulWidget {
   final bool isShattered;
   
   const ShatterCard({
-    Key? key,
+    super.key,
     required this.child,
     this.isShattered = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ShatterCard> createState() => _ShatterCardState();

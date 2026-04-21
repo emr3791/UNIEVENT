@@ -4,7 +4,7 @@ import '../../data/mock_sdui_data.dart';
 import '../../../../core/utils/haptic_utils.dart';
 
 class DynamicClubPage extends StatelessWidget {
-  const DynamicClubPage({Key? key}) : super(key: key);
+  const DynamicClubPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,9 +5,9 @@ class PaymentScreen extends StatefulWidget {
   final Event event;
 
   const PaymentScreen({
-    Key? key,
+    super.key,
     required this.event,
-  }) : super(key: key);
+  });
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();

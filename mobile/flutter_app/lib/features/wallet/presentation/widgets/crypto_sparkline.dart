@@ -6,10 +6,10 @@ class CryptoSparkline extends StatelessWidget {
   final bool isPositive;
 
   const CryptoSparkline({
-    Key? key,
+    super.key,
     required this.prices,
     required this.isPositive,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

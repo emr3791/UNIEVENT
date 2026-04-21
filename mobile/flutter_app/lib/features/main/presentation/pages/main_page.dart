@@ -8,9 +8,10 @@ import '../../../../widgets/app_drawer.dart';
 import '../../../explore/presentation/pages/explore_page.dart';
 import '../../../wallet/presentation/pages/wallet_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../../screens/faq_screen.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -26,6 +27,7 @@ class _MainPageState extends State<MainPage> {
     const MessagingScreen(),
     const ExplorePage(),
     const WalletPage(),
+    const FaqScreen(),
     const ProfilePage(),
   ];
 
@@ -35,6 +37,7 @@ class _MainPageState extends State<MainPage> {
     {'icon': LineIcons.comment, 'label': 'Mesajlar'},
     {'icon': LineIcons.compass, 'label': 'Keşfet'},
     {'icon': LineIcons.wallet, 'label': 'Cüzdan'},
+    {'icon': LineIcons.questionCircle, 'label': 'SSS'},
     {'icon': LineIcons.user, 'label': 'Profil'},
   ];
 

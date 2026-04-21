@@ -4,7 +4,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 class HologramTicket extends StatefulWidget {
   final Widget child;
-  const HologramTicket({Key? key, required this.child}) : super(key: key);
+  const HologramTicket({super.key, required this.child});
 
   @override
   State<HologramTicket> createState() => _HologramTicketState();

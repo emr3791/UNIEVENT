@@ -6,7 +6,7 @@ import '../utils/animation_utils.dart';
 import 'event_detail_screen.dart';
 
 class AnnouncementsScreen extends StatelessWidget {
-  const AnnouncementsScreen({Key? key}) : super(key: key);
+  const AnnouncementsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

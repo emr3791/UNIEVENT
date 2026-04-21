@@ -9,12 +9,12 @@ class EventCard extends StatelessWidget {
   final int participantCount;
 
   const EventCard({
-    Key? key,
+    super.key,
     required this.event,
     required this.onTap,
     this.onBuyTap,
     this.participantCount = 0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

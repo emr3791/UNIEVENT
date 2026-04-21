@@ -8,13 +8,13 @@ class CategoryCard extends StatelessWidget {
   final bool isSelected;
 
   const CategoryCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.icon,
     required this.color,
     required this.onTap,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
