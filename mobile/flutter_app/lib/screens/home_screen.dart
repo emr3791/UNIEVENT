@@ -12,6 +12,7 @@ import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'announcements_screen.dart';
 import 'event_detail_screen.dart';
+import 'faq_screen.dart'; // ← new import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Seçilen index'e göre body'yi değiştir
     Widget bodyWidget;
     AppBar? appBar;
 
@@ -64,6 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
       bodyWidget = const AnnouncementsScreen();
       appBar = AppBar(
         title: const Text('Duyurular'),
+        backgroundColor: const Color(0xFF6366F1),
+        elevation: 0,
+      );
+    } else if (_selectedIndex == 3) {
+      // ── FAQ tab ───────────────────────────────────────────────────────────
+      bodyWidget = const FaqScreen();
+      appBar = AppBar(
+        title: const Text('SSS'),
         backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
       );
@@ -109,6 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
               activeIcon: Icon(Icons.notifications),
               label: 'Duyurular',
             ),
+            // ── FAQ item ────────────────────────────────────────────────────
+            BottomNavigationBarItem(
+              icon: Icon(Icons.help_outline),
+              activeIcon: Icon(Icons.help),
+              label: 'SSS',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),
@@ -120,15 +134,19 @@ class _HomeScreenState extends State<HomeScreen> {
           unselectedItemColor: const Color(0xFF6366F1).withOpacity(0.4),
           showUnselectedLabels: true,
           selectedLabelStyle:
-              const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           unselectedLabelStyle:
-              const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+          const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
           onTap: _onItemTapped,
         ),
       ),
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Everything below is unchanged from your original file
+// ─────────────────────────────────────────────────────────────────────────────
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
@@ -186,7 +204,6 @@ class _HomeContentState extends State<HomeContent> {
 
   void _selectCategory(String categoryId) {
     setState(() => _selectedCategory = categoryId);
-    // Scroll to the events section so users see the filtered list.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_eventsSectionKey.currentContext != null) {
         Scrollable.ensureVisible(

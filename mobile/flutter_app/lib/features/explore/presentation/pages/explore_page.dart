@@ -6,7 +6,7 @@ import '../../../sdui/presentation/pages/dynamic_club_page.dart';
 import 'ar_radar_page.dart';
 
 class ExplorePage extends StatefulWidget {
-  const ExplorePage({Key? key}) : super(key: key);
+  const ExplorePage({super.key});
 
   @override
   State<ExplorePage> createState() => _ExplorePageState();

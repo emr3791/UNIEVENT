@@ -9,10 +9,10 @@ class CreditCardWallet extends StatefulWidget {
   final double balance;
 
   const CreditCardWallet({
-    Key? key,
+    super.key,
     required this.userId,
     required this.balance,
-  }) : super(key: key);
+  });
 
   @override
   State<CreditCardWallet> createState() => _CreditCardWalletState();

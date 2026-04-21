@@ -9,12 +9,12 @@ class PhysicsButton extends StatefulWidget {
   final BoxDecoration? decoration;
   
   const PhysicsButton({
-    Key? key, 
+    super.key, 
     required this.child, 
     required this.onPressed,
     this.padding,
     this.decoration,
-  }) : super(key: key);
+  });
 
   @override
   State<PhysicsButton> createState() => _PhysicsButtonState();

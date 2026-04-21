@@ -6,7 +6,7 @@ import 'event_card.dart';
 import '../../../../core/utils/haptic_utils.dart';
 
 class CampusMapView extends StatefulWidget {
-  const CampusMapView({Key? key}) : super(key: key);
+  const CampusMapView({super.key});
 
   @override
   State<CampusMapView> createState() => _CampusMapViewState();

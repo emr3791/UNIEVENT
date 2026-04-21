@@ -6,11 +6,11 @@ class AppLogo extends StatefulWidget {
   final Color? color;
 
   const AppLogo({
-    Key? key,
+    super.key,
     this.size = 64,
     this.showText = true,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   State<AppLogo> createState() => _AppLogoState();

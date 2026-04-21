@@ -5,7 +5,7 @@ import '../widgets/university_card.dart';
 import '../widgets/app_drawer.dart';
 
 class UniversitiesScreen extends StatefulWidget {
-  const UniversitiesScreen({Key? key}) : super(key: key);
+  const UniversitiesScreen({super.key});
 
   @override
   State<UniversitiesScreen> createState() => _UniversitiesScreenState();

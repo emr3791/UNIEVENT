@@ -11,9 +11,9 @@ class UniversityDetailScreen extends StatefulWidget {
   final University university;
 
   const UniversityDetailScreen({
-    Key? key,
+    super.key,
     required this.university,
-  }) : super(key: key);
+  });
 
   @override
   State<UniversityDetailScreen> createState() => _UniversityDetailScreenState();

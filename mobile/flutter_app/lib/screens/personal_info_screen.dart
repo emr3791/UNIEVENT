@@ -10,7 +10,7 @@ import '../models/user.dart';
 import 'avatar_edit_screen.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
-  const PersonalInfoScreen({Key? key}) : super(key: key);
+  const PersonalInfoScreen({super.key});
 
   @override
   State<PersonalInfoScreen> createState() => _PersonalInfoScreenState();

@@ -5,7 +5,7 @@ import '../widgets/hologram_ticket.dart';
 import '../../../explore/data/models/event_model.dart'; // Using mock models
 
 class WalletPage extends StatelessWidget {
-  const WalletPage({Key? key}) : super(key: key);
+  const WalletPage({super.key});
 
   @override
   Widget build(BuildContext context) {

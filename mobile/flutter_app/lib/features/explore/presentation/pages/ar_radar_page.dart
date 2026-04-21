@@ -6,7 +6,7 @@ import '../../data/models/event_model.dart';
 import '../widgets/event_card.dart';
 
 class ArRadarPage extends StatefulWidget {
-  const ArRadarPage({Key? key}) : super(key: key);
+  const ArRadarPage({super.key});
 
   @override
   State<ArRadarPage> createState() => _ArRadarPageState();
