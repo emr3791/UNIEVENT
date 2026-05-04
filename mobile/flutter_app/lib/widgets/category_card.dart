@@ -8,13 +8,13 @@ class CategoryCard extends StatelessWidget {
   final bool isSelected;
 
   const CategoryCard({
-    super.key,
+    Key? key,
     required this.title,
     required this.icon,
     required this.color,
     required this.onTap,
     this.isSelected = false,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +22,18 @@ class CategoryCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.25) : color.withOpacity(0.1),
+          color: isSelected
+              ? color.withAlpha((0.25 * 255).round())
+              : color.withAlpha((0.1 * 255).round()),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? color : color.withOpacity(0.3),
+            color: isSelected ? color : color.withAlpha(76),
             width: isSelected ? 2 : 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.2),
+                    color: color.withAlpha((0.2 * 255).round()),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -47,8 +49,8 @@ class CategoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isSelected
-                    ? color.withOpacity(0.35)
-                    : color.withOpacity(0.2),
+                    ? color.withAlpha((0.35 * 255).round())
+                    : color.withAlpha((0.2 * 255).round()),
               ),
               child: Icon(icon, color: color, size: 32),
             ),

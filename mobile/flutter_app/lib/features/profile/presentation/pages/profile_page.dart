@@ -13,7 +13,7 @@ import '../../../../models/user.dart';
 import '../../../../providers/auth_provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -86,9 +86,9 @@ class _ProfilePageState extends State<ProfilePage> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.5),
+            color: theme.colorScheme.surface.withAlpha(128),
             border: Border(
-              bottom: BorderSide(color: theme.primaryColor.withOpacity(0.2), width: 1),
+              bottom: BorderSide(color: theme.primaryColor.withAlpha(51), width: 1),
             ),
           ),
           child: Column(
@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         Text(
                           user?.email ?? 'Giriş yapılmadı',
-                          style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6), fontSize: 12),
+                          style: TextStyle(color: theme.colorScheme.onSurface.withAlpha(153), fontSize: 12),
                         ),
                       ],
                     ),
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     label: const Text("Düzenle", style: TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      backgroundColor: theme.primaryColor.withOpacity(0.2),
+                      backgroundColor: theme.primaryColor.withAlpha(51),
                       foregroundColor: theme.primaryColor,
                       elevation: 0,
                     ),
@@ -183,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
       label: Text(title, style: const TextStyle(fontSize: 12)),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      side: BorderSide(color: Theme.of(context).primaryColor.withOpacity(0.3)),
+      side: BorderSide(color: Theme.of(context).primaryColor.withAlpha(76)),
       onPressed: onTap,
     );
   }
@@ -207,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-              color: theme.scaffoldBackgroundColor.withOpacity(0.8),
+              color: theme.scaffoldBackgroundColor.withAlpha(204),
               child: Row(
                 children: [
                   Expanded(
@@ -217,12 +217,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
+                        border: Border.all(color: theme.primaryColor.withAlpha(76)),
                       ),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Kampüs Asistanına yaz...",
-                        style: TextStyle(color: Colors.grey.withOpacity(0.8)),
+                        style: TextStyle(color: Colors.grey.withAlpha(204)),
                       ),
                     ),
                   ),
@@ -293,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
             border: Border.all(color: color, width: 2),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.5),
+                color: color.withAlpha(128),
                 blurRadius: 10,
                 spreadRadius: 2,
               )

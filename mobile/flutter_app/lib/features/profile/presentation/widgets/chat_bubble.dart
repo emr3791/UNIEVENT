@@ -17,7 +17,7 @@ class ChatMessage {
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
 
-  const ChatBubble({super.key, required this.message});
+  const ChatBubble({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class ChatBubble extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withAlpha(26),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   )

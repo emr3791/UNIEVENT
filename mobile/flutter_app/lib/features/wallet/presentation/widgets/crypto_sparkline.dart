@@ -6,10 +6,10 @@ class CryptoSparkline extends StatelessWidget {
   final bool isPositive;
 
   const CryptoSparkline({
-    super.key,
+    Key? key,
     required this.prices,
     required this.isPositive,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +39,11 @@ class CryptoSparkline extends StatelessWidget {
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: color.withOpacity(0.2),
+                color: color.withAlpha((0.2 * 255).round()),
                 gradient: LinearGradient(
                   colors: [
-                    color.withOpacity(0.3),
-                    color.withOpacity(0.0),
+                    color.withAlpha((0.3 * 255).round()),
+                    color.withAlpha((0.0 * 255).round()),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

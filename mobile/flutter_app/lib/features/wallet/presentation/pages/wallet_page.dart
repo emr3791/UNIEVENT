@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../widgets/credit_card_wallet.dart';
+import 'package:provider/provider.dart';
+import '../../../../providers/wallet_provider.dart';
+import '../../../../providers/auth_provider.dart';
 import '../widgets/crypto_sparkline.dart';
 import '../widgets/hologram_ticket.dart';
 import '../../../explore/data/models/event_model.dart'; // Using mock models
 
 class WalletPage extends StatelessWidget {
-  const WalletPage({super.key});
+  const WalletPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +30,19 @@ class WalletPage extends StatelessWidget {
                 style: theme.textTheme.displayLarge?.copyWith(fontSize: 32),
               ),
               const SizedBox(height: 24),
-              const CreditCardWallet(userId: 'ID-8429-TECH', balance: 1450.50),
-              
+              CreditCardWallet(
+                userId: Provider.of<AuthProvider>(context).currentUser?.id ??
+                    'anon',
+                balance: Provider.of<WalletProvider>(context).balance,
+              ),
+
               const SizedBox(height: 32),
               Text(
                 'Biletlerim (Hologram)',
                 style: theme.textTheme.displayLarge?.copyWith(fontSize: 20),
               ),
               const SizedBox(height: 16),
-              
+
               // Hologram Ticket Display Map
               SizedBox(
                 height: 180,
@@ -57,7 +64,7 @@ class WalletPage extends StatelessWidget {
                               image: NetworkImage(event.imageUrl),
                               fit: BoxFit.cover,
                               colorFilter: ColorFilter.mode(
-                                Colors.black.withOpacity(0.5),
+                                Colors.black.withAlpha(128),
                                 BlendMode.darken,
                               ),
                             ),
@@ -66,20 +73,20 @@ class WalletPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              const Icon(Icons.qr_code_scanner, color: Colors.white, size: 30),
+                              const Icon(Icons.qr_code_scanner,
+                                  color: Colors.white, size: 30),
                               const Spacer(),
                               Text(
                                 event.title,
                                 style: const TextStyle(
-                                  color: Colors.white, 
-                                  fontSize: 20, 
-                                  fontWeight: FontWeight.bold
-                                ),
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 event.locationName,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withAlpha(204),
                                   fontSize: 14,
                                 ),
                               ),
@@ -91,7 +98,7 @@ class WalletPage extends StatelessWidget {
                   },
                 ),
               ),
-              
+
               const SizedBox(height: 32),
               Text(
                 'Borsada Etkinlikler (Popülerlik)',
@@ -108,9 +115,11 @@ class WalletPage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildStockRow('Neon Kampüs Partisi', 'Çok Yüksek Talep', prices1, true),
+                    _buildStockRow('Neon Kampüs Partisi', 'Çok Yüksek Talep',
+                        prices1, true),
                     const Divider(color: Colors.grey, height: 32),
-                    _buildStockRow('Açık Hava Sineması', 'Düşük İvme', prices2, false),
+                    _buildStockRow(
+                        'Açık Hava Sineması', 'Düşük İvme', prices2, false),
                   ],
                 ),
               ),
@@ -122,7 +131,8 @@ class WalletPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStockRow(String title, String subtitle, List<double> prices, bool isPositive) {
+  Widget _buildStockRow(
+      String title, String subtitle, List<double> prices, bool isPositive) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -131,9 +141,10 @@ class WalletPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title, 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                maxLines: 1, 
+                title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),

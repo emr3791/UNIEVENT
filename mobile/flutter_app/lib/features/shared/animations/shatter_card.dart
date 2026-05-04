@@ -7,10 +7,10 @@ class ShatterCard extends StatefulWidget {
   final bool isShattered;
   
   const ShatterCard({
-    super.key,
+    Key? key,
     required this.child,
     this.isShattered = false,
-  });
+  }) : super(key: key);
 
   @override
   State<ShatterCard> createState() => _ShatterCardState();
@@ -81,7 +81,7 @@ class _ShatterPainter extends CustomPainter {
     if (progress == 0) return;
 
     final paint = Paint()
-      ..color = Colors.grey.withOpacity((1 - progress).clamp(0.0, 1.0))
+      ..color = Colors.grey.withAlpha(((1 - progress) * 255).round().clamp(0, 255))
       ..style = PaintingStyle.fill;
 
     final random = math.Random(42); // Seed for consistent shatter pattern

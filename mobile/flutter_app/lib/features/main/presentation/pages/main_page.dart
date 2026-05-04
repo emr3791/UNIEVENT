@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../widgets/onboarding_overlay.dart';
 import 'package:line_icons/line_icons.dart';
 import '../../../../core/utils/haptic_utils.dart';
 import '../../../../screens/home_screen.dart';
@@ -8,10 +10,9 @@ import '../../../../widgets/app_drawer.dart';
 import '../../../explore/presentation/pages/explore_page.dart';
 import '../../../wallet/presentation/pages/wallet_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
-import '../../../../screens/faq_screen.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  const MainPage({Key? key}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -27,7 +28,6 @@ class _MainPageState extends State<MainPage> {
     const MessagingScreen(),
     const ExplorePage(),
     const WalletPage(),
-    const FaqScreen(),
     const ProfilePage(),
   ];
 
@@ -37,7 +37,6 @@ class _MainPageState extends State<MainPage> {
     {'icon': LineIcons.comment, 'label': 'Mesajlar'},
     {'icon': LineIcons.compass, 'label': 'Keşfet'},
     {'icon': LineIcons.wallet, 'label': 'Cüzdan'},
-    {'icon': LineIcons.questionCircle, 'label': 'SSS'},
     {'icon': LineIcons.user, 'label': 'Profil'},
   ];
 
@@ -45,6 +44,17 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
+    // Show onboarding overlay on first run
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      final seen = prefs.getBool('seen_onboarding') ?? false;
+      if (!seen) {
+        await showDialog(
+            context: context, builder: (ctx) => const OnboardingOverlay());
+        await prefs.setBool('seen_onboarding', true);
+      }
+    });
   }
 
   @override
@@ -97,14 +107,14 @@ class _MainPageState extends State<MainPage> {
                   width: 24,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: theme.primaryColor.withOpacity(0.4),
+                    color: theme.primaryColor.withAlpha(102),
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withAlpha(26),
                         blurRadius: 5,
                         offset: const Offset(2, 0),
                       ),
@@ -123,7 +133,7 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: Container(
         height: 82,
         decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor.withOpacity(0.95),
+          color: theme.scaffoldBackgroundColor.withAlpha(242),
           border: Border(top: BorderSide(color: theme.dividerColor)),
         ),
         child: Column(
@@ -150,7 +160,7 @@ class _MainPageState extends State<MainPage> {
                               horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? theme.primaryColor.withOpacity(0.15)
+                                ? theme.primaryColor.withAlpha(38)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -161,8 +171,9 @@ class _MainPageState extends State<MainPage> {
                                 item['icon'] as IconData,
                                 size: 20,
                                 color: isSelected
-                                    ? theme.primaryColor
-                                    : theme.iconTheme.color?.withOpacity(0.7),
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface
+                                        .withAlpha(178),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -173,9 +184,9 @@ class _MainPageState extends State<MainPage> {
                                       ? FontWeight.w700
                                       : FontWeight.normal,
                                   color: isSelected
-                                      ? theme.primaryColor
-                                      : theme.iconTheme.color
-                                          ?.withOpacity(0.75),
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.onSurface
+                                          .withAlpha(191),
                                 ),
                               )
                             ],

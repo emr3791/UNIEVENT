@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/reusable_banner.dart';
 import '../providers/event_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/event_chat_provider.dart';
@@ -12,13 +13,12 @@ import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'announcements_screen.dart';
 import 'event_detail_screen.dart';
-import 'faq_screen.dart'; // ← new import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Seçilen index'e göre body'yi değiştir
     Widget bodyWidget;
     AppBar? appBar;
 
@@ -67,14 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF6366F1),
         elevation: 0,
       );
-    } else if (_selectedIndex == 3) {
-      // ── FAQ tab ───────────────────────────────────────────────────────────
-      bodyWidget = const FaqScreen();
-      appBar = AppBar(
-        title: const Text('SSS'),
-        backgroundColor: const Color(0xFF6366F1),
-        elevation: 0,
-      );
     } else {
       bodyWidget = const ProfileScreen();
       appBar = AppBar(
@@ -92,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withAlpha((0.05 * 255).round()),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -100,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
+          backgroundColor: theme.colorScheme.surface,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
@@ -117,12 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
               activeIcon: Icon(Icons.notifications),
               label: 'Duyurular',
             ),
-            // ── FAQ item ────────────────────────────────────────────────────
-            BottomNavigationBarItem(
-              icon: Icon(Icons.help_outline),
-              activeIcon: Icon(Icons.help),
-              label: 'SSS',
-            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),
@@ -130,13 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFF6366F1),
-          unselectedItemColor: const Color(0xFF6366F1).withOpacity(0.4),
+          selectedItemColor: theme.colorScheme.primary,
+          unselectedItemColor:
+              theme.colorScheme.onSurface.withAlpha((0.4 * 255).round()),
           showUnselectedLabels: true,
           selectedLabelStyle:
-          const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           unselectedLabelStyle:
-          const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+              const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
           onTap: _onItemTapped,
         ),
       ),
@@ -144,15 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Everything below is unchanged from your original file
-// ─────────────────────────────────────────────────────────────────────────────
-
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
   @override
-  _HomeContentState createState() => _HomeContentState();
+  State<HomeContent> createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
@@ -204,6 +189,7 @@ class _HomeContentState extends State<HomeContent> {
 
   void _selectCategory(String categoryId) {
     setState(() => _selectedCategory = categoryId);
+    // Scroll to the events section so users see the filtered list.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_eventsSectionKey.currentContext != null) {
         Scrollable.ensureVisible(
@@ -234,60 +220,24 @@ class _HomeContentState extends State<HomeContent> {
   Widget build(BuildContext context) {
     final eventProvider = Provider.of<EventProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome Header
+          // Welcome Header (reusable banner)
           if (_showWelcomeBanner)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Merhaba, ${authProvider.currentUser?.fullName ?? "Kullanıcı"}!',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Üniversite etkinliklerini keşfet',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          _showWelcomeBanner = false;
-                        });
-                      },
-                    ),
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ReusableBanner(
+                icon: Icons.waving_hand,
+                title:
+                    'Hoş geldiniz, ${authProvider.currentUser?.fullName ?? "Kullanıcı"}!',
+                subtitle: 'Üniversite etkinliklerini keşfetmeye ne dersiniz?',
+                actionLabel: 'Kapat',
+                onAction: () => setState(() => _showWelcomeBanner = false),
               ),
             ),
           const SizedBox(height: 16),
@@ -337,7 +287,8 @@ class _HomeContentState extends State<HomeContent> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.orange.withOpacity(0.3),
+                                color: Colors.orange
+                                    .withAlpha((0.3 * 255).round()),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -363,13 +314,14 @@ class _HomeContentState extends State<HomeContent> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
+                                        color: theme.colorScheme.onPrimary
+                                            .withAlpha((0.15 * 255).round()),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'YENİ',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: theme.colorScheme.onPrimary,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -378,8 +330,8 @@ class _HomeContentState extends State<HomeContent> {
                                     const Spacer(),
                                     Text(
                                       announcement.title,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onPrimary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -432,7 +384,7 @@ class _HomeContentState extends State<HomeContent> {
                               height: 130,
                               width: 115,
                               decoration: BoxDecoration(
-                                color: color.withOpacity(0.2),
+                                color: color.withAlpha((0.2 * 255).round()),
                                 borderRadius: BorderRadius.circular(18),
                               ),
                             ),
@@ -446,7 +398,7 @@ class _HomeContentState extends State<HomeContent> {
                               height: 130,
                               width: 110,
                               decoration: BoxDecoration(
-                                color: color.withOpacity(0.4),
+                                color: color.withAlpha((0.4 * 255).round()),
                                 borderRadius: BorderRadius.circular(18),
                               ),
                             ),
@@ -459,10 +411,13 @@ class _HomeContentState extends State<HomeContent> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: isSelected
-                                    ? [color, color.withOpacity(0.7)]
+                                    ? [
+                                        color,
+                                        color.withAlpha((0.7 * 255).round())
+                                      ]
                                     : [
-                                        color.withOpacity(0.85),
-                                        color.withOpacity(0.6)
+                                        color.withAlpha((0.85 * 255).round()),
+                                        color.withAlpha((0.6 * 255).round())
                                       ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -470,8 +425,8 @@ class _HomeContentState extends State<HomeContent> {
                               borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color:
-                                      color.withOpacity(isSelected ? 0.5 : 0.2),
+                                  color: color.withAlpha(
+                                      ((isSelected ? 0.5 : 0.2) * 255).round()),
                                   blurRadius: isSelected ? 16 : 8,
                                   offset: const Offset(0, 6),
                                 ),
@@ -486,7 +441,8 @@ class _HomeContentState extends State<HomeContent> {
                                   child: Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.25),
+                                      color: theme.colorScheme.onPrimary
+                                          .withAlpha((0.18 * 255).round()),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -561,13 +517,15 @@ class _HomeContentState extends State<HomeContent> {
                     ? Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
                           child: Text(
                             'Seçili kategoride yaklaşan etkinlik yok',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: TextStyle(
+                                color: theme.colorScheme.onSurface
+                                    .withAlpha((0.7 * 255).round())),
                           ),
                         ),
                       )
@@ -582,12 +540,11 @@ class _HomeContentState extends State<HomeContent> {
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color:
-                                    const Color(0xFF6366F1).withOpacity(0.05),
+                                color: const Color(0xFF6366F1).withAlpha(13),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                    color: const Color(0xFF6366F1)
-                                        .withOpacity(0.2)),
+                                    color:
+                                        const Color(0xFF6366F1).withAlpha(51)),
                               ),
                               child: Row(
                                 children: [
@@ -667,6 +624,20 @@ class _HomeContentState extends State<HomeContent> {
                                               } else {
                                                 eventProvider
                                                     .joinEvent(event.id);
+                                                // Ensure event chat is created and user added
+                                                final chatProv = Provider.of<
+                                                        EventChatProvider>(
+                                                    context,
+                                                    listen: false);
+                                                final authUser =
+                                                    Provider.of<AuthProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .currentUser;
+                                                chatProv.joinEvent(
+                                                    event.id,
+                                                    event.title,
+                                                    authUser?.id ?? 'guest');
                                               }
                                             },
                                             style: ElevatedButton.styleFrom(
@@ -730,16 +701,12 @@ class _HomeContentState extends State<HomeContent> {
                 }
 
                 if (eventProvider.error != null) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Hata: ${eventProvider.error}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
+                  return ReusableBanner(
+                    icon: Icons.error_outline,
+                    title: 'Etkinlikler yüklenemedi',
+                    subtitle: eventProvider.error ?? 'Bilinmeyen hata',
+                    actionLabel: 'Yenile',
+                    onAction: () => eventProvider.loadEvents(),
                   );
                 }
 

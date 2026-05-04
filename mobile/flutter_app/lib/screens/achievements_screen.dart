@@ -8,13 +8,14 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final achievementProvider = Provider.of<AchievementProvider>(context);
     final List<Achievement> all = achievementProvider.achievements;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Başarılarım'),
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: theme.colorScheme.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -33,13 +34,12 @@ class AchievementsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: unlocked
-                    ? const Color(0xFF6366F1).withOpacity(0.1)
-                    : Colors.grey[200],
+                    ? theme.colorScheme.primary.withAlpha((0.08 * 255).round())
+                    : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: unlocked
-                      ? const Color(0xFF6366F1)
-                      : Colors.grey.withOpacity(0.4),
+                  color:
+                      unlocked ? theme.colorScheme.primary : theme.dividerColor,
                 ),
               ),
               child: Column(
@@ -55,7 +55,10 @@ class AchievementsScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: unlocked ? Colors.black87 : Colors.grey[600],
+                      color: unlocked
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface
+                              .withAlpha((0.8 * 255).round()),
                     ),
                   ),
                   const SizedBox(height: 4),

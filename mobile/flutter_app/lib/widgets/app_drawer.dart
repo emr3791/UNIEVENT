@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/app_logo.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +233,8 @@ class AppDrawer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
+        border: Border.all(
+            color: const Color(0xFF6366F1).withAlpha((0.3 * 255).round())),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -355,7 +356,7 @@ class AppDrawer extends StatelessWidget {
           height: 44,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0xFF6366F1).withOpacity(0.1),
+            color: const Color(0xFF6366F1).withAlpha((0.1 * 255).round()),
           ),
           child: Icon(icon, color: const Color(0xFF6366F1), size: 20),
         ),

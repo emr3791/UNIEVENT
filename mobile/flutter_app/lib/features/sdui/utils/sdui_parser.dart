@@ -37,7 +37,7 @@ class SduiParser {
         image: DecorationImage(
           image: NetworkImage(props['imageUrl']),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken),
+          colorFilter: ColorFilter.mode(Colors.black.withAlpha(153), BlendMode.darken),
         ),
       ),
       child: Column(
@@ -51,7 +51,7 @@ class SduiParser {
           const SizedBox(height: 8),
           Text(
             props['subtitle'],
-            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16),
+            style: TextStyle(color: Colors.white.withAlpha(204), fontSize: 16),
           )
         ],
       ),
@@ -87,7 +87,7 @@ class SduiParser {
               image: DecorationImage(
                 image: NetworkImage(item['imageUrl']),
                 fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
+                colorFilter: ColorFilter.mode(Colors.black.withAlpha(102), BlendMode.darken),
               ),
             ),
             alignment: Alignment.bottomLeft,
@@ -113,7 +113,7 @@ class SduiParser {
           hintText: props['placeholder'],
           prefixIcon: Icon(iconData, color: primaryColor),
           filled: true,
-          fillColor: Colors.grey.withOpacity(0.1),
+          fillColor: Colors.grey.withAlpha(26),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide.none,

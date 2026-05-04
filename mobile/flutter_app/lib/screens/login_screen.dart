@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/app_logo.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Üniversite etkinliklerini keşfet',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withAlpha(230),
                     ),
                   ),
                   const SizedBox(height: 48),
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Login Type Toggle
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(4),
@@ -157,11 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? 'Öğrenci E-postası (örn: ogrenci@student.edu.tr)'
                           : 'E-posta Adresi',
                       hintStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withAlpha(178),
                       ),
                       prefixIcon: const Icon(Icons.email, color: Colors.white),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.1),
+                      fillColor: Colors.white.withAlpha(26),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -179,11 +180,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: InputDecoration(
                       hintText: 'Şifre',
                       hintStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withAlpha(178),
                       ),
                       prefixIcon: const Icon(Icons.lock, color: Colors.white),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.1),
+                      fillColor: Colors.white.withAlpha(26),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -240,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         'Hesabın yok mu? ',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withAlpha(204),
                           fontSize: 14,
                         ),
                       ),

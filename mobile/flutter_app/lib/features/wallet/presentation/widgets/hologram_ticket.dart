@@ -4,7 +4,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 class HologramTicket extends StatefulWidget {
   final Widget child;
-  const HologramTicket({super.key, required this.child});
+  const HologramTicket({Key? key, required this.child}) : super(key: key);
 
   @override
   State<HologramTicket> createState() => _HologramTicketState();
@@ -18,7 +18,8 @@ class _HologramTicketState extends State<HologramTicket> {
   @override
   void initState() {
     super.initState();
-    _accelerometerSubscription = accelerometerEventStream().listen((AccelerometerEvent event) {
+    _accelerometerSubscription =
+        accelerometerEventStream().listen((AccelerometerEvent event) {
       // Normalize accelerometer roughly from -10..10 to 0..1
       setState(() {
         _xRatio = ((event.x + 10) / 20).clamp(0.0, 1.0);
@@ -49,11 +50,11 @@ class _HologramTicketState extends State<HologramTicket> {
                   begin: FractionalOffset(_xRatio * 2 - 0.5, _yRatio * 2 - 0.5),
                   end: FractionalOffset(1.0 - _xRatio, 1.0 - _yRatio),
                   colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.4),
-                    Colors.purpleAccent.withOpacity(0.2),
-                    Colors.cyanAccent.withOpacity(0.2),
-                    Colors.white.withOpacity(0.0),
+                    Colors.white.withAlpha((0.0 * 255).round()),
+                    Colors.white.withAlpha((0.4 * 255).round()),
+                    Colors.purpleAccent.withAlpha((0.2 * 255).round()),
+                    Colors.cyanAccent.withAlpha((0.2 * 255).round()),
+                    Colors.white.withAlpha((0.0 * 255).round()),
                   ],
                   stops: const [0.0, 0.4, 0.5, 0.6, 1.0],
                 ),

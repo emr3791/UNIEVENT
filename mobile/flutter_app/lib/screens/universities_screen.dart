@@ -5,7 +5,7 @@ import '../widgets/university_card.dart';
 import '../widgets/app_drawer.dart';
 
 class UniversitiesScreen extends StatefulWidget {
-  const UniversitiesScreen({super.key});
+  const UniversitiesScreen({Key? key}) : super(key: key);
 
   @override
   State<UniversitiesScreen> createState() => _UniversitiesScreenState();
@@ -41,7 +41,7 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
           // Search and Filter
           Container(
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFF6366F1).withOpacity(0.05),
+            color: const Color(0xFF6366F1).withAlpha(13),
             child: Column(
               children: [
                 // Search Box
@@ -163,7 +163,7 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Üniversite Ekle'),
         content: SingleChildScrollView(
           child: Column(
@@ -231,8 +231,8 @@ class _UniversitiesScreenState extends State<UniversitiesScreen> {
                 description: descriptionController.text,
               );
 
-              if (mounted) {
-                Navigator.pop(context);
+              if (dialogContext.mounted) {
+                Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Üniversite başarıyla eklendi'),

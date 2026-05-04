@@ -14,8 +14,10 @@ class AppTheme {
         secondary: AppColors.secondaryNeon,
         surface: AppColors.surfaceLight,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme).copyWith(
-        displayLarge: GoogleFonts.poppins(color: AppColors.textLight, fontWeight: FontWeight.bold),
+      textTheme:
+          GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme).copyWith(
+        displayLarge: GoogleFonts.poppins(
+            color: AppColors.textLight, fontWeight: FontWeight.bold),
         bodyLarge: GoogleFonts.poppins(color: AppColors.textLight),
       ),
       appBarTheme: const AppBarTheme(
@@ -38,8 +40,10 @@ class AppTheme {
         secondary: AppColors.secondaryNeon,
         surface: AppColors.surfaceDark,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
-        displayLarge: GoogleFonts.poppins(color: AppColors.textDark, fontWeight: FontWeight.bold),
+      textTheme:
+          GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
+        displayLarge: GoogleFonts.poppins(
+            color: AppColors.textDark, fontWeight: FontWeight.bold),
         bodyLarge: GoogleFonts.poppins(color: AppColors.textDark),
       ),
       appBarTheme: const AppBarTheme(
@@ -51,13 +55,42 @@ class AppTheme {
     );
   }
 
-  static ThemeData getUniversityTheme({required String code, required bool isDark}) {
+  static ThemeData getUniversityTheme(
+      {required String code, required bool isDark}) {
     final uniColor = AppColors.getUniversityColor(code);
     final baseTheme = isDark ? darkTheme : lightTheme;
     return baseTheme.copyWith(
       primaryColor: uniColor,
       colorScheme: baseTheme.colorScheme.copyWith(
         primary: uniColor,
+      ),
+    );
+  }
+
+  // Prototype black -> gold theme
+  static ThemeData get goldTheme {
+    const gold = Color(0xFFFFD700);
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: gold,
+      scaffoldBackgroundColor: Colors.black,
+      colorScheme: const ColorScheme.dark(
+        primary: gold,
+        secondary: gold,
+        surface: Color(0xFF111111),
+      ),
+      textTheme:
+          GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
+        displayLarge: GoogleFonts.poppins(
+            color: Colors.white, fontWeight: FontWeight.bold),
+        bodyLarge: GoogleFonts.poppins(color: Colors.white70),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: gold),
       ),
     );
   }

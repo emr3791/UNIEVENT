@@ -38,7 +38,8 @@ final List<EventModel> mockEvents = [
     id: '1',
     title: 'Neon Kampüs Partisi',
     description: 'Yılın en büyük kampüs içi DJ performansı.',
-    imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop',
+    imageUrl:
+        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop',
     date: DateTime.now().add(const Duration(days: 2)),
     latitude: 41.0082,
     longitude: 28.9784,
@@ -51,7 +52,8 @@ final List<EventModel> mockEvents = [
     id: '2',
     title: 'Açık Hava Sineması',
     description: 'Interstellar gösterimi, herkese açık!',
-    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1000&auto=format&fit=crop',
+    imageUrl:
+        'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1000&auto=format&fit=crop',
     date: DateTime.now().add(const Duration(days: 5)),
     latitude: 41.0122,
     longitude: 28.9814,
@@ -64,7 +66,8 @@ final List<EventModel> mockEvents = [
     id: '3',
     title: 'Teknoloji Zirvesi 2024',
     description: 'Sektörün devleri kampüste buluşuyor.',
-    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop',
+    imageUrl:
+        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop',
     date: DateTime.now().add(const Duration(days: 10)),
     latitude: 41.0152,
     longitude: 28.9754,
@@ -77,7 +80,8 @@ final List<EventModel> mockEvents = [
     id: '4',
     title: 'Güzel Sanatlar Sergisi',
     description: 'Dönem sonu projeleri görücüye çıkıyor.',
-    imageUrl: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?q=80&w=1000&auto=format&fit=crop',
+    imageUrl:
+        'https://images.unsplash.com/photo-1518998053901-5348d3961a04?q=80&w=1000&auto=format&fit=crop',
     date: DateTime.now().add(const Duration(days: 1)),
     latitude: 41.0202,
     longitude: 28.9804,
@@ -85,5 +89,19 @@ final List<EventModel> mockEvents = [
     isPublic: false,
     targetUniversityCode: 'ART',
     price: 20.0,
+  ),
+  EventModel(
+    id: 'paid_1000',
+    title: 'Özel Ücretli Etkinlik',
+    description: 'Sınırlı kontenjanlı premium etkinlik (mock).',
+    imageUrl:
+        'https://images.unsplash.com/photo-1505685296765-3a2736de412f?q=80&w=1000&auto=format&fit=crop',
+    date: DateTime.now().add(const Duration(days: 7)),
+    latitude: 41.0162,
+    longitude: 28.9794,
+    locationName: 'Premium Salon',
+    isPublic: false,
+    targetUniversityCode: 'ALL',
+    price: 1000.0,
   ),
 ];

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ShaderBackground extends StatefulWidget {
   final Widget? child;
-  const ShaderBackground({super.key, this.child});
+  const ShaderBackground({Key? key, this.child}) : super(key: key);
 
   @override
   State<ShaderBackground> createState() => _ShaderBackgroundState();
@@ -59,9 +59,9 @@ class _ShaderBackgroundState extends State<ShaderBackground> with SingleTickerPr
         _shader!.setFloat(2, _controller.value * 20.0); // Zaman çarpanı
         
         final primaryColor = Theme.of(context).primaryColor;
-        _shader!.setFloat(3, primaryColor.red / 255.0);
-        _shader!.setFloat(4, primaryColor.green / 255.0);
-        _shader!.setFloat(5, primaryColor.blue / 255.0);
+        _shader!.setFloat(3, primaryColor.r);
+        _shader!.setFloat(4, primaryColor.g);
+        _shader!.setFloat(5, primaryColor.b);
 
         return CustomPaint(
           painter: _ShaderPainter(_shader!),

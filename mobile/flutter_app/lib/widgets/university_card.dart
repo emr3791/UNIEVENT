@@ -6,10 +6,10 @@ class UniversityCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const UniversityCard({
-    super.key,
+    Key? key,
     required this.university,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class UniversityCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha((0.1 * 255).round()),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -38,7 +38,8 @@ class UniversityCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: const Color(0xFF6366F1).withOpacity(0.2),
+                      color: const Color(0xFF6366F1)
+                          .withAlpha((0.2 * 255).round()),
                       child: const Icon(
                         Icons.school,
                         size: 48,
@@ -57,7 +58,7 @@ class UniversityCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.6),
+                        Colors.black.withAlpha((0.6 * 255).round()),
                       ],
                     ),
                   ),
@@ -104,7 +105,8 @@ class UniversityCard extends StatelessWidget {
                           if (university.rating != null)
                             Row(
                               children: [
-                                const Icon(Icons.star, size: 14, color: Colors.amber),
+                                const Icon(Icons.star,
+                                    size: 14, color: Colors.amber),
                                 const SizedBox(width: 2),
                                 Text(
                                   '${university.rating}',

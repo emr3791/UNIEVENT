@@ -9,16 +9,17 @@ class CreditCardWallet extends StatefulWidget {
   final double balance;
 
   const CreditCardWallet({
-    super.key,
+    Key? key,
     required this.userId,
     required this.balance,
-  });
+  }) : super(key: key);
 
   @override
   State<CreditCardWallet> createState() => _CreditCardWalletState();
 }
 
-class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerProviderStateMixin {
+class _CreditCardWalletState extends State<CreditCardWallet>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isFlipped = false;
 
@@ -36,14 +37,14 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
     if (_isFlipped) {
       _controller.reverse();
       try {
-        await ScreenBrightness().resetScreenBrightness();
+        await ScreenBrightness().resetApplicationScreenBrightness();
       } catch (e) {
         debugPrint('Parlaklık sıfırlanamadı: $e');
       }
     } else {
       _controller.forward();
       try {
-        await ScreenBrightness().setScreenBrightness(1.0);
+        await ScreenBrightness().setApplicationScreenBrightness(1.0);
       } catch (e) {
         debugPrint('Parlaklık fullenemedi: $e');
       }
@@ -54,7 +55,9 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
   @override
   void dispose() {
     _controller.dispose();
-    ScreenBrightness().resetScreenBrightness();
+    try {
+      ScreenBrightness().resetApplicationScreenBrightness();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -98,7 +101,7 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
         ),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.4),
+            color: theme.colorScheme.primary.withAlpha(102),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 8),
@@ -121,7 +124,8 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
                   letterSpacing: 2.0,
                 ),
               ),
-              Icon(Icons.contactless, color: Colors.white.withOpacity(0.8), size: 32),
+              Icon(Icons.contactless,
+                  color: Colors.white.withAlpha(204), size: 32),
             ],
           ),
           Column(
@@ -129,7 +133,8 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
             children: [
               Text(
                 'TOPLAM BAKİYE',
-                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+                style: TextStyle(
+                    color: Colors.white.withAlpha(178), fontSize: 12),
               ),
               Text(
                 '${widget.balance} UNV',
@@ -144,7 +149,7 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
           Text(
             widget.userId,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withAlpha(204),
               fontSize: 16,
               letterSpacing: 4.0,
             ),
@@ -166,10 +171,11 @@ class _CreditCardWalletState extends State<CreditCardWallet> with SingleTickerPr
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           color: theme.colorScheme.surface,
-          border: Border.all(color: theme.colorScheme.primary.withOpacity(0.5), width: 2),
+          border: Border.all(
+              color: theme.colorScheme.primary.withAlpha(128), width: 2),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.2),
+              color: theme.colorScheme.primary.withAlpha(51),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )

@@ -6,11 +6,11 @@ class AppLogo extends StatefulWidget {
   final Color? color;
 
   const AppLogo({
-    super.key,
+    Key? key,
     this.size = 64,
     this.showText = true,
     this.color,
-  });
+  }) : super(key: key);
 
   @override
   State<AppLogo> createState() => _AppLogoState();
@@ -41,7 +41,6 @@ class _AppLogoState extends State<AppLogo> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final primary = widget.color ?? Theme.of(context).primaryColor;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,18 +67,18 @@ class _AppLogoState extends State<AppLogo> with SingleTickerProviderStateMixin {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: widget.size * 0.9,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    shadows: [
-                      Shadow(
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                        color: Colors.black.withOpacity(0.3),
-                      ),
-                    ],
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                      shadows: [
+                        Shadow(
+                          offset: const Offset(0, 4),
+                          blurRadius: 8,
+                          color: Colors.black.withAlpha((0.3 * 255).round()),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
                 // Black 'U' facing DOWN (using Rotation)
                 Positioned(
                   top: widget.size * 0.15,
@@ -90,19 +89,20 @@ class _AppLogoState extends State<AppLogo> with SingleTickerProviderStateMixin {
                       style: TextStyle(
                         color: Colors.black87, // Mor yerine siyah
                         fontSize: widget.size * 0.9,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                      shadows: [
-                        Shadow(
-                          offset: const Offset(0, 4), // Shadow reversed because text is flipped
-                          blurRadius: 8,
-                          color: Colors.black.withOpacity(0.3),
-                        ),
-                      ],
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        shadows: [
+                          Shadow(
+                            offset: const Offset(0,
+                                4), // Shadow reversed because text is flipped
+                            blurRadius: 8,
+                            color: Colors.black.withAlpha((0.3 * 255).round()),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
               ],
             ),
           ),

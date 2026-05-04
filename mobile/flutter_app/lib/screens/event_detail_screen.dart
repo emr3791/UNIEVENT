@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../providers/event_provider.dart';
 import '../providers/notification_provider.dart';
 import '../widgets/app_drawer.dart';
+import '../widgets/reusable_banner.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
@@ -14,15 +15,15 @@ class EventDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final dateFormat = DateFormat('EEEE, dd MMMM yyyy HH:mm', 'tr_TR');
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.currentUser;
 
     return Scaffold(
-      
       appBar: AppBar(
         title: const Text('Etkinlik Detayları'),
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: theme.colorScheme.primary,
       ),
       drawer: const AppDrawer(),
       body: SingleChildScrollView(
@@ -42,11 +43,12 @@ class EventDetailScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: const Color(0xFF6366F1).withOpacity(0.2),
-                        child: const Icon(
+                        color: theme.colorScheme.primary
+                            .withAlpha((0.12 * 255).round()),
+                        child: Icon(
                           Icons.event,
                           size: 80,
-                          color: Color(0xFF6366F1),
+                          color: theme.colorScheme.primary,
                         ),
                       );
                     },
@@ -54,19 +56,24 @@ class EventDetailScreen extends StatelessWidget {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _getCategoryColor(event.category),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        _getCategoryLabel(event.category),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 140),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _getCategoryColor(event.category),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _getCategoryLabel(event.category),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
@@ -83,11 +90,9 @@ class EventDetailScreen extends StatelessWidget {
                   // Title
                   Text(
                     event.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface),
                   ),
                   const SizedBox(height: 12),
 
@@ -109,10 +114,12 @@ class EventDetailScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withOpacity(0.05),
+                      color: const Color(0xFF6366F1)
+                          .withAlpha((0.05 * 255).round()),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        color: const Color(0xFF6366F1)
+                            .withAlpha((0.2 * 255).round()),
                       ),
                     ),
                     child: Column(
@@ -163,14 +170,8 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    event.description,
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      height: 1.6,
-                      fontSize: 14,
-                    ),
-                  ),
+                  Text(event.description,
+                      style: theme.textTheme.bodyMedium?.copyWith(height: 1.6)),
 
                   const SizedBox(height: 24),
 
@@ -190,24 +191,20 @@ class EventDetailScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withOpacity(0.1),
+                            color: const Color(0xFF6366F1)
+                                .withAlpha((0.1 * 255).round()),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Bilet Fiyatı',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Text(
-                                '₺${event.price!.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF6366F1),
-                                ),
-                              ),
+                              Text('Bilet Fiyatı',
+                                  style: theme.textTheme.bodyLarge),
+                              Text('₺${event.price!.toStringAsFixed(2)}',
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -384,20 +381,10 @@ class EventDetailScreen extends StatelessWidget {
                       if (restrictionMessage == null) {
                         return const SizedBox.shrink();
                       }
-                      return Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border:
-                              Border.all(color: Colors.red.withOpacity(0.2)),
-                        ),
-                        child: Text(
-                          restrictionMessage,
-                          style:
-                              TextStyle(color: Colors.red[800], fontSize: 12),
-                        ),
+                      return ReusableBanner(
+                        icon: Icons.lock_outline,
+                        title: 'Katılma Kısıtı',
+                        subtitle: restrictionMessage,
                       );
                     },
                   ),

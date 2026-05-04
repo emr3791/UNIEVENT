@@ -75,7 +75,6 @@ class SocialProvider extends ChangeNotifier {
   final Map<String, Set<String>> _followers = {};
   final List<SocialUser> _allUsers = [];
   final Map<String, DirectConversation> _conversations = {};
-  String? _currentUserId;
 
   static final List<SocialUser> _mockUsers = [
     SocialUser(id: 'u1', fullName: 'Ayşe Kaya', username: 'aysekaya', university: 'İstanbul Teknik Üniversitesi', isOnline: true, avatarSkinTone: 'light', avatarHairStyle: 'default'),
@@ -88,7 +87,6 @@ class SocialProvider extends ChangeNotifier {
   List<SocialUser> get allUsers => List.unmodifiable(_allUsers);
 
   void initForUser(User user) {
-    _currentUserId = user.id;
     _allUsers
       ..clear()
       ..addAll(_mockUsers);

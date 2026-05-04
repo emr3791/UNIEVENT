@@ -9,12 +9,12 @@ class EventCard extends StatelessWidget {
   final int participantCount;
 
   const EventCard({
-    super.key,
+    Key? key,
     required this.event,
     required this.onTap,
     this.onBuyTap,
     this.participantCount = 0,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class EventCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha((0.1 * 255).round()),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -50,7 +50,8 @@ class EventCard extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        color: const Color(0xFF6366F1)
+                            .withAlpha((0.2 * 255).round()),
                         child: const Icon(
                           Icons.event,
                           size: 48,
@@ -64,13 +65,14 @@ class EventCard extends StatelessWidget {
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withAlpha((0.9 * 255).round()),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF6366F1).withOpacity(0.8),
+                          color: const Color(0xFF6366F1)
+                              .withAlpha((0.8 * 255).round()),
                           width: 1,
                         ),
                       ),
@@ -100,11 +102,11 @@ class EventCard extends StatelessWidget {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color:
-                            _getCategoryColor(event.category).withOpacity(0.9),
+                        color: _getCategoryColor(event.category)
+                            .withAlpha((0.9 * 255).round()),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

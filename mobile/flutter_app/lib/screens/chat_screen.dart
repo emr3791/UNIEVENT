@@ -6,8 +6,7 @@ import '../providers/auth_provider.dart';
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
-  @override
-  _ChatScreenState createState() => _ChatScreenState();
+  @override  State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
@@ -96,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               decoration: BoxDecoration(
                                 color: isCurrentUser
                                     ? const Color(0xFF6366F1)
-                                    : const Color(0xFF6366F1).withOpacity(0.1),
+                                    : const Color(0xFF6366F1).withAlpha(26),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
@@ -128,7 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: isCurrentUser
-                                          ? Colors.white.withOpacity(0.7)
+                                          ? Colors.white.withAlpha(178)
                                           : Colors.grey[600],
                                     ),
                                   ),

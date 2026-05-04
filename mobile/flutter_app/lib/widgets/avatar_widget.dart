@@ -9,11 +9,11 @@ class AvatarWidget extends StatelessWidget {
   final bool showBorder;
 
   const AvatarWidget({
-    super.key,
+    Key? key,
     required this.user,
     this.size = 56,
     this.showBorder = false,
-  });
+  }) : super(key: key);
 
   Color _skinToneColor(String? tone) {
     switch (tone) {

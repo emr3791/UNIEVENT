@@ -7,7 +7,8 @@ class EventChatScreen extends StatefulWidget {
   final String eventId;
   final String eventTitle;
 
-  const EventChatScreen({super.key, required this.eventId, required this.eventTitle});
+  const EventChatScreen(
+      {super.key, required this.eventId, required this.eventTitle});
 
   @override
   State<EventChatScreen> createState() => _EventChatScreenState();
@@ -38,27 +39,33 @@ class _EventChatScreenState extends State<EventChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final chatProvider = context.watch<EventChatProvider>();
     final authProvider = context.read<AuthProvider>();
     final currentUser = authProvider.currentUser;
     final currentUserId = currentUser?.id ?? 'guest';
     final currentUserName = currentUser?.fullName ?? 'Kullanıcı';
 
-    final room = chatProvider.getOrCreateRoom(widget.eventId, widget.eventTitle);
+    final room =
+        chatProvider.getOrCreateRoom(widget.eventId, widget.eventTitle);
     final isAdm = chatProvider.isAdmin(widget.eventId, currentUserId);
 
     _scrollToBottom();
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: theme.colorScheme.primary,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.eventTitle, style: const TextStyle(fontSize: 16, color: Colors.white)),
+            Text(widget.eventTitle,
+                style: TextStyle(
+                    fontSize: 16, color: theme.colorScheme.onPrimary)),
             Text(
               '${room.memberIds.length} katılımcı',
-              style: const TextStyle(fontSize: 11, color: Colors.white70),
+              style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onPrimary.withAlpha(230)),
             ),
           ],
         ),
@@ -68,7 +75,8 @@ class _EventChatScreenState extends State<EventChatScreen> {
               icon: const Icon(Icons.admin_panel_settings, color: Colors.white),
               onSelected: (val) {
                 if (val == 'toggle_restrict') {
-                  chatProvider.toggleMessagingRestriction(widget.eventId, currentUserId);
+                  chatProvider.toggleMessagingRestriction(
+                      widget.eventId, currentUserId);
                 }
               },
               itemBuilder: (_) => [
@@ -76,9 +84,15 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   value: 'toggle_restrict',
                   child: Row(
                     children: [
-                      Icon(room.isMessagingRestricted ? Icons.lock_open : Icons.lock, size: 20),
+                      Icon(
+                          room.isMessagingRestricted
+                              ? Icons.lock_open
+                              : Icons.lock,
+                          size: 20),
                       const SizedBox(width: 8),
-                      Text(room.isMessagingRestricted ? 'Kısıtlamayı Kaldır' : 'Sohbeti Kısıtla'),
+                      Text(room.isMessagingRestricted
+                          ? 'Kısıtlamayı Kaldır'
+                          : 'Sohbeti Kısıtla'),
                     ],
                   ),
                 ),
@@ -91,15 +105,17 @@ class _EventChatScreenState extends State<EventChatScreen> {
           if (room.isMessagingRestricted && !isAdm)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Colors.orange.shade100,
-              child: const Row(
+              color: theme.colorScheme.secondary.withAlpha(31),
+              child: Row(
                 children: [
-                  Icon(Icons.lock, size: 16, color: Colors.orange),
-                  SizedBox(width: 8),
+                  Icon(Icons.lock,
+                      size: 16, color: theme.colorScheme.secondary),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Sohbet yalnızca adminler tarafından kullanılabilir.',
-                      style: TextStyle(color: Colors.orange, fontSize: 12),
+                      style: TextStyle(
+                          color: theme.colorScheme.secondary, fontSize: 12),
                     ),
                   ),
                 ],
@@ -120,19 +136,25 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   return Center(
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(msg.text, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      child: Text(msg.text,
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurface
+                                  .withAlpha(191))),
                     ),
                   );
                 }
 
                 if (isAnnouncement) {
                   return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -145,47 +167,59 @@ class _EventChatScreenState extends State<EventChatScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.campaign, color: Colors.white, size: 16),
+                            Icon(Icons.campaign,
+                                color: theme.colorScheme.onPrimary, size: 16),
                             const SizedBox(width: 6),
-                            Text(msg.senderName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                            Text(msg.senderName,
+                                style: TextStyle(
+                                    color: theme.colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13)),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        Text(msg.text, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        Text(msg.text,
+                            style: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                                fontSize: 14)),
                       ],
                     ),
                   );
                 }
 
-                return _buildMessageBubble(msg, isMe);
+                return _buildMessageBubble(msg, isMe, theme);
               },
             ),
           ),
-          _buildInput(room, isAdm, currentUserId, currentUserName, chatProvider),
+          _buildInput(
+              room, isAdm, currentUserId, currentUserName, chatProvider, theme),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage msg, bool isMe) {
+  Widget _buildMessageBubble(ChatMessage msg, bool isMe, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
             CircleAvatar(
               radius: 14,
-              backgroundColor: const Color(0xFF6366F1).withOpacity(0.15),
+              backgroundColor: theme.colorScheme.primary.withAlpha(38),
               child: Text(msg.senderName.isNotEmpty ? msg.senderName[0] : '?',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF6366F1))),
+                  style: TextStyle(
+                      fontSize: 12, color: theme.colorScheme.primary)),
             ),
             const SizedBox(width: 6),
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 if (!isMe)
                   Padding(
@@ -193,18 +227,26 @@ class _EventChatScreenState extends State<EventChatScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(msg.senderName, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                        Text(msg.senderName,
+                            style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w600)),
                         if (msg.isAdmin) ...[
                           const SizedBox(width: 4),
-                          const Icon(Icons.verified, size: 13, color: Color(0xFF6366F1)),
+                          const Icon(Icons.verified,
+                              size: 13, color: Color(0xFF6366F1)),
                         ],
                       ],
                     ),
                   ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isMe ? const Color(0xFF6366F1) : Colors.white,
+                    color: isMe
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.surface,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(18),
                       topRight: const Radius.circular(18),
@@ -213,7 +255,7 @@ class _EventChatScreenState extends State<EventChatScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.withAlpha(15),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -222,7 +264,9 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   child: Text(
                     msg.text,
                     style: TextStyle(
-                      color: isMe ? Colors.white : Colors.black87,
+                      color: isMe
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface,
                       fontSize: 14,
                     ),
                   ),
@@ -231,7 +275,9 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
                   child: Text(
                     '${msg.sentAt.hour.toString().padLeft(2, '0')}:${msg.sentAt.minute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: theme.colorScheme.onSurface.withAlpha(153)),
                   ),
                 ),
               ],
@@ -243,14 +289,20 @@ class _EventChatScreenState extends State<EventChatScreen> {
     );
   }
 
-  Widget _buildInput(EventChatRoom room, bool isAdmin, String userId, String userName, EventChatProvider chatProvider) {
+  Widget _buildInput(EventChatRoom room, bool isAdmin, String userId,
+      String userName, EventChatProvider chatProvider, ThemeData theme) {
     final canSend = isAdmin || !room.isMessagingRestricted;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, -2))],
+        color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withAlpha(18),
+              blurRadius: 10,
+              offset: const Offset(0, -2))
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -259,7 +311,7 @@ class _EventChatScreenState extends State<EventChatScreen> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
@@ -269,7 +321,8 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   decoration: InputDecoration(
                     hintText: canSend ? 'Mesaj yaz...' : 'Sohbet kısıtlandı',
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                   ),
                 ),
               ),
@@ -280,13 +333,16 @@ class _EventChatScreenState extends State<EventChatScreen> {
                   ? () {
                       final text = _textController.text.trim();
                       if (text.isEmpty) return;
-                      chatProvider.sendMessage(widget.eventId, userId, userName, text, isAdmin: isAdmin);
+                      chatProvider.sendMessage(
+                          widget.eventId, userId, userName, text,
+                          isAdmin: isAdmin);
                       _textController.clear();
                     }
                   : null,
               child: CircleAvatar(
                 radius: 22,
-                backgroundColor: canSend ? const Color(0xFF6366F1) : Colors.grey.shade300,
+                backgroundColor:
+                    canSend ? theme.colorScheme.primary : theme.disabledColor,
                 child: const Icon(Icons.send, color: Colors.white, size: 18),
               ),
             ),

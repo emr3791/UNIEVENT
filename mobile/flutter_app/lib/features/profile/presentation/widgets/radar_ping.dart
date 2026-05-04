@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 class RadarPing extends StatefulWidget {
   final Widget child;
-  const RadarPing({super.key, required this.child});
+  const RadarPing({Key? key, required this.child}) : super(key: key);
 
   @override
   State<RadarPing> createState() => _RadarPingState();
@@ -62,7 +62,7 @@ class _PingPainter extends CustomPainter {
       double opacity = (1.0 - currentProgress).clamp(0.0, 0.4);
 
       final paint = Paint()
-        ..color = color.withOpacity(opacity)
+        ..color = color.withAlpha((opacity * 255).round())
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
 

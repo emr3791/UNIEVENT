@@ -72,7 +72,7 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF6366F1).withOpacity(0.1)
+                      ? const Color(0xFF6366F1).withAlpha(26)
                       : Colors.grey.shade100,
                   border: Border.all(
                     color: isSelected

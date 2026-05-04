@@ -9,12 +9,12 @@ class PhysicsButton extends StatefulWidget {
   final BoxDecoration? decoration;
   
   const PhysicsButton({
-    super.key, 
+    Key? key, 
     required this.child, 
     required this.onPressed,
     this.padding,
     this.decoration,
-  });
+  }) : super(key: key);
 
   @override
   State<PhysicsButton> createState() => _PhysicsButtonState();
@@ -85,7 +85,7 @@ class _PhysicsButtonState extends State<PhysicsButton> with SingleTickerProvider
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.4),
+                color: Theme.of(context).primaryColor.withAlpha(102),
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),

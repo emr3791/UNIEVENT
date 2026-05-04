@@ -5,7 +5,7 @@ import '../data/istanbul_universities.dart';
 import '../widgets/app_logo.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+  const RegistrationScreen({Key? key}) : super(key: key);
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -154,7 +154,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     'Yeni Hesap Oluştur',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(204),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -162,10 +162,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   // User Type Toggle
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withAlpha(76),
                         width: 1,
                       ),
                     ),
@@ -263,7 +263,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       Text(
                         'Cinsiyet',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withAlpha(178),
                           fontSize: 12,
                         ),
                       ),
@@ -271,10 +271,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withAlpha(38),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withAlpha(76),
                             width: 1,
                           ),
                         ),
@@ -314,7 +314,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Text(
                           'Üniversite',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withAlpha(178),
                             fontSize: 12,
                           ),
                         ),
@@ -322,10 +322,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withAlpha(38),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withAlpha(76),
                               width: 1,
                             ),
                           ),
@@ -404,7 +404,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         child: Text(
                           'Şartları ve Koşulları Kabul Ediyorum',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withAlpha(230),
                             fontSize: 13,
                           ),
                         ),
@@ -427,7 +427,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             backgroundColor: Colors.white,
                             foregroundColor: const Color(0xFF6366F1),
                             disabledBackgroundColor:
-                                Colors.white.withOpacity(0.5),
+                                Colors.white.withAlpha(128),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -463,7 +463,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       Text(
                         'Zaten bir hesabın var mı? ',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withAlpha(204),
                         ),
                       ),
                       GestureDetector(
@@ -503,10 +503,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-        prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
+        labelStyle: TextStyle(color: Colors.white.withAlpha(178)),
+        prefixIcon: Icon(icon, color: Colors.white.withAlpha(178)),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.15),
+        fillColor: Colors.white.withAlpha(38),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -514,7 +514,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withAlpha(76),
             width: 1,
           ),
         ),
@@ -541,17 +541,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-        prefixIcon: Icon(Icons.lock, color: Colors.white.withOpacity(0.7)),
+        labelStyle: TextStyle(color: Colors.white.withAlpha(178)),
+        prefixIcon: Icon(Icons.lock, color: Colors.white.withAlpha(178)),
         suffixIcon: GestureDetector(
           onTap: onToggle,
           child: Icon(
             isObscure ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withAlpha(178),
           ),
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.15),
+        fillColor: Colors.white.withAlpha(38),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -559,7 +559,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withAlpha(76),
             width: 1,
           ),
         ),

@@ -11,9 +11,9 @@ class UniversityDetailScreen extends StatefulWidget {
   final University university;
 
   const UniversityDetailScreen({
-    super.key,
+    Key? key,
     required this.university,
-  });
+  }) : super(key: key);
 
   @override
   State<UniversityDetailScreen> createState() => _UniversityDetailScreenState();
@@ -57,7 +57,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: const Color(0xFF6366F1).withOpacity(0.2),
+                        color: const Color(0xFF6366F1).withAlpha(51),
                         child: const Icon(
                           Icons.school,
                           size: 80,
@@ -74,7 +74,7 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.5),
+                            Colors.black.withAlpha(128),
                           ],
                         ),
                       ),
@@ -317,10 +317,10 @@ class _UniversityDetailScreenState extends State<UniversityDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF6366F1).withOpacity(0.1),
+        color: const Color(0xFF6366F1).withAlpha(26),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF6366F1).withOpacity(0.3),
+          color: const Color(0xFF6366F1).withAlpha(76),
         ),
       ),
       child: Column(

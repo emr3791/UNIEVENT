@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        tileColor: Colors.white.withOpacity(0.08),
+                        tileColor: Colors.white.withAlpha(20),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: const Text(
                             'Gizli bilgilerinizi burada güvenli bir şekilde yönetin.'),
                         trailing: Icon(Icons.chevron_right,
-                            color: Colors.white.withOpacity(0.6)),
+                            color: Colors.white.withAlpha(153)),
                         onTap: () {
                           Navigator.pushNamed(context, '/personal_info');
                         },

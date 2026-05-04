@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Theme.of(context).primaryColor.withOpacity(0.2), Colors.transparent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    try {
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).primaryColor.withAlpha(51),
+                Colors.transparent
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
+          child: const Center(
+              child: Text('Ana Sayfa - Etkinlik Akışı',
+                  style: TextStyle(fontSize: 20))),
         ),
-        child: const Center(
-          child: Text('Ana Sayfa - Etkinlik Akışı', style: TextStyle(fontSize: 20)),
-        ),
-      ),
-    );
+      );
+    } catch (e, st) {
+      debugPrint('HomePage build error: $e\n$st');
+      return const Center(child: Text('Anasayfa yüklenemiyor'));
+    }
   }
 }

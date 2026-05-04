@@ -5,7 +5,7 @@ import 'event_card.dart';
 import '../../../../core/utils/haptic_utils.dart';
 
 class DiscoverSwipeView extends StatefulWidget {
-  const DiscoverSwipeView({super.key});
+  const DiscoverSwipeView({Key? key}) : super(key: key);
 
   @override
   State<DiscoverSwipeView> createState() => _DiscoverSwipeViewState();
