@@ -23,13 +23,11 @@ import 'providers/event_chat_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize intl locale data used by DateFormat
   try {
     await initializeDateFormatting('tr_TR');
-  } catch (_) {
-    // ignore if initialization fails; DateFormat will fallback
+  } catch (e) {
+    debugPrint('Locale init failed: $e');
   }
-  // Global friendly error handler to avoid red/yellow render errors in release/dev
   ErrorWidget.builder = (FlutterErrorDetails details) {
     debugPrint('Flutter Error caught: ${details.exception}\n${details.stack}');
     return Padding(
@@ -53,11 +51,11 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => EventProvider()),
-        ChangeNotifierProvider(create: (_) => AchievementProvider()),
-        ChangeNotifierProvider(create: (_) => WalletProvider()),
-        ChangeNotifierProvider(create: (_) => SocialProvider()),
-        ChangeNotifierProvider(create: (_) => EventChatProvider()),
+        ChangeNotifierProvider(create: (_) => EventProvider(), lazy: true),
+        ChangeNotifierProvider(create: (_) => AchievementProvider(), lazy: true),
+        ChangeNotifierProvider(create: (_) => WalletProvider(), lazy: true),
+        ChangeNotifierProvider(create: (_) => SocialProvider(), lazy: true),
+        ChangeNotifierProvider(create: (_) => EventChatProvider(), lazy: true),
       ],
       child: const UniEventApp(),
     ),
@@ -65,24 +63,26 @@ void main() async {
 }
 
 class UniEventApp extends StatelessWidget {
-  const UniEventApp({Key? key}) : super(key: key);
+  const UniEventApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
+        final lightTheme = AppTheme.getUniversityTheme(
+          code: themeProvider.universityCode,
+          isDark: false,
+        );
+        final darkTheme = AppTheme.getUniversityTheme(
+          code: themeProvider.universityCode,
+          isDark: true,
+        );
         return MaterialApp(
           title: 'UniEvent AI',
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
-          theme: AppTheme.getUniversityTheme(
-            code: themeProvider.universityCode,
-            isDark: false,
-          ),
-          darkTheme: AppTheme.getUniversityTheme(
-            code: themeProvider.universityCode,
-            isDark: true,
-          ),
+          theme: lightTheme,
+          darkTheme: darkTheme,
           initialRoute: '/',
           routes: {
             '/': (context) => const OnboardingScreen(),

@@ -30,7 +30,9 @@ class _CampusMapViewState extends State<CampusMapView> {
   void initState() {
     super.initState();
     _loadMapStyle();
-    _buildMarkersAndHeatmap();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _buildMarkersAndHeatmap();
+    });
   }
 
   Future<void> _loadMapStyle() async {
@@ -66,8 +68,8 @@ class _CampusMapViewState extends State<CampusMapView> {
         circleId: CircleId('heat_${event.id}'),
         center: LatLng(event.latitude, event.longitude),
         radius: event.isPublic ? 800 : 400, // Vary radius based on event mock
-        fillColor: Colors.deepOrangeAccent.withOpacity(0.3),
-        strokeColor: Colors.orangeAccent.withOpacity(0.1),
+        fillColor: Colors.deepOrangeAccent.withAlpha(76),
+        strokeColor: Colors.orangeAccent.withAlpha(25),
         strokeWidth: 40,
       ));
 
@@ -76,7 +78,7 @@ class _CampusMapViewState extends State<CampusMapView> {
         circleId: CircleId('core_${event.id}'),
         center: LatLng(event.latitude, event.longitude),
         radius: event.isPublic ? 300 : 150,
-        fillColor: Colors.redAccent.withOpacity(0.5),
+        fillColor: Colors.redAccent.withAlpha(128),
         strokeWidth: 0,
       ));
     }
@@ -85,21 +87,22 @@ class _CampusMapViewState extends State<CampusMapView> {
   Widget _buildCustomBottomSheet() {
     final event = _selectedEvent ?? _cachedEvent;
     if (event == null) return const SizedBox(height: 500);
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
+        color: theme.scaffoldBackgroundColor.withAlpha(250),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         border: Border(
           top: BorderSide(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: theme.primaryColor.withAlpha(76),
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withAlpha(128),
             blurRadius: 20,
             offset: const Offset(0, -5),
           )
@@ -119,7 +122,7 @@ class _CampusMapViewState extends State<CampusMapView> {
               height: 5,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.5),
+                color: Colors.grey.withAlpha(128),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),

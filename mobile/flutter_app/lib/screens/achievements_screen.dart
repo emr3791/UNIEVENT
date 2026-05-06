@@ -27,52 +27,55 @@ class AchievementsScreen extends StatelessWidget {
             childAspectRatio: 1,
           ),
           itemCount: all.length,
-          itemBuilder: (context, index) {
-            final ach = all[index];
-            final unlocked = ach.isUnlocked;
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: unlocked
-                    ? theme.colorScheme.primary.withAlpha((0.08 * 255).round())
-                    : theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color:
-                      unlocked ? theme.colorScheme.primary : theme.dividerColor,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    ach.icon,
-                    style: const TextStyle(fontSize: 32),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    ach.title,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: unlocked
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface
-                              .withAlpha((0.8 * 255).round()),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  if (!unlocked)
-                    Text(
-                      'Kilidi açmak için ilerleme: ${ach.progress}%',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                ],
-              ),
-            );
-          },
+          itemBuilder: (context, index) => _AchievementCard(ach: all[index]),
         ),
+      ),
+    );
+  }
+}
+
+class _AchievementCard extends StatelessWidget {
+  final Achievement ach;
+  const _AchievementCard({required this.ach});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final unlocked = ach.isUnlocked;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: unlocked
+            ? theme.colorScheme.primary.withAlpha((0.08 * 255).round())
+            : theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: unlocked ? theme.colorScheme.primary : theme.dividerColor,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(ach.icon, style: const TextStyle(fontSize: 32)),
+          const SizedBox(height: 8),
+          Text(
+            ach.title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: unlocked
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurface.withAlpha((0.8 * 255).round()),
+            ),
+          ),
+          const SizedBox(height: 4),
+          if (!unlocked)
+            Text(
+              'Kilidi açmak için ilerleme: ${ach.progress}%',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            ),
+        ],
       ),
     );
   }
