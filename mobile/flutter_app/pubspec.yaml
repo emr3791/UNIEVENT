@@ -26,6 +26,7 @@ dependencies:
   qr_flutter: ^4.1.0
   screen_brightness: ^2.1.7
   flutter_secure_storage: ^10.0.0
+  cached_network_image: ^3.3.0
 
 flutter:
   uses-material-design: true

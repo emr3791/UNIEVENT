@@ -4,6 +4,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../../data/models/event_model.dart';
 import 'event_card.dart';
 import '../../../../core/utils/haptic_utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+// This file has been optimised
 
 class CampusMapView extends StatefulWidget {
   const CampusMapView({super.key});
@@ -36,14 +39,17 @@ class _CampusMapViewState extends State<CampusMapView> {
   }
 
   Future<void> _loadMapStyle() async {
-    _mapStyle =
-        await rootBundle.loadString('assets/map_style/dark_neon_style.json');
-    if (_mapController != null) {
-      _mapController!.setMapStyle(_mapStyle);
+    final style = await rootBundle.loadString('assets/map_style/dark_neon_style.json');
+    if (mounted) {
+      setState(() {
+        _mapStyle = style;
+      });
     }
   }
 
   void _buildMarkersAndHeatmap() {
+    _markers.clear();
+    _heatmapCircles.clear();
     for (var event in mockEvents) {
       // Create Pin Marker
       _markers.add(
@@ -170,37 +176,37 @@ class _CampusMapViewState extends State<CampusMapView> {
             )
           : Stack(
               children: [
-                Builder(builder: (context) {
-                  try {
-                    return GoogleMap(
-                      initialCameraPosition: _initialPosition,
-                      markers: _markers,
-                      circles: _heatmapCircles,
-                      myLocationEnabled: false,
-                      myLocationButtonEnabled: false,
-                      zoomControlsEnabled: false,
-                      mapToolbarEnabled: false,
-                      compassEnabled: false,
-                      onMapCreated: (GoogleMapController controller) {
-                        _mapController = controller;
-                        if (_mapStyle.isNotEmpty) {
-                          _mapController!.setMapStyle(_mapStyle);
-                        }
-                      },
-                      onTap: (_) {
-                        if (_selectedEvent != null) {
-                          setState(() => _selectedEvent = null);
-                        }
-                      },
-                    );
-                  } catch (error, stackTrace) {
-                    setState(() {
-                      _mapError = true;
-                    });
-                    debugPrint('Map render error: $error\n$stackTrace');
-                    return const SizedBox.shrink();
-                  }
-                }),
+                RepaintBoundary(
+                  child: Builder(builder: (context) {
+                    try {
+                      return GoogleMap(
+                        initialCameraPosition: _initialPosition,
+                        markers: _markers,
+                        circles: _heatmapCircles,
+                        style: _mapStyle.isNotEmpty ? _mapStyle : null,  // ← add this
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        zoomControlsEnabled: false,
+                        mapToolbarEnabled: false,
+                        compassEnabled: false,
+                        onMapCreated: (GoogleMapController controller) {
+                          _mapController = controller;  // ← removed setMapStyle from here
+                        },
+                        onTap: (_) {
+                          if (_selectedEvent != null) {
+                            setState(() => _selectedEvent = null);
+                          }
+                        },
+                      );
+                    } catch (error, stackTrace) {
+                      setState(() {
+                        _mapError = true;
+                      });
+                      debugPrint('Map render error: $error\n$stackTrace');
+                      return const SizedBox.shrink();
+                    }
+                  }),
+                ),
 
                 // Stories Overlay at the top
                 Positioned(
@@ -223,7 +229,7 @@ class _CampusMapViewState extends State<CampusMapView> {
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.fastOutSlowIn,
-                  bottom: _selectedEvent != null ? 0 : -600,
+                  bottom: _selectedEvent != null ? 0 : -MediaQuery.of(context).size.height,
                   left: 0,
                   right: 0,
                   child: _buildCustomBottomSheet(),
@@ -272,7 +278,7 @@ class _CampusMapViewState extends State<CampusMapView> {
               CircleAvatar(
                 radius: 32,
                 backgroundColor: theme.colorScheme.surface,
-                backgroundImage: const NetworkImage(
+                backgroundImage: const CachedNetworkImageProvider(
                     'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop'),
               ),
               CircleAvatar(
@@ -318,7 +324,7 @@ class _CampusMapViewState extends State<CampusMapView> {
               ),
               child: CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage(imageUrl),
+                backgroundImage: CachedNetworkImageProvider(imageUrl),
               ),
             ),
           ),
