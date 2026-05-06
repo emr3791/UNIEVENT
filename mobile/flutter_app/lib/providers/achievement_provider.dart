@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/achievement.dart';
 
+// This file has been optimized
+// unlockedDate is now nullable!
+
 class AchievementProvider with ChangeNotifier {
   final List<Achievement> _achievements = [
     Achievement(
@@ -8,7 +11,7 @@ class AchievementProvider with ChangeNotifier {
       title: 'İlk Adım',
       description: 'İlk etkinliğine katıl',
       icon: '🎉',
-      unlockedDate: DateTime.now(),
+      unlockedDate: null,
       isUnlocked: false,
       progress: 0,
     ),
@@ -17,7 +20,7 @@ class AchievementProvider with ChangeNotifier {
       title: '5 Etkinlik',
       description: '5 etkinliğe katıl',
       icon: '⭐',
-      unlockedDate: DateTime.now(),
+      unlockedDate: null,
       isUnlocked: false,
       progress: 20,
     ),
@@ -26,7 +29,7 @@ class AchievementProvider with ChangeNotifier {
       title: 'Favori Koleksiyoncusu',
       description: '10 etkinliği favorilere ekle',
       icon: '❤️',
-      unlockedDate: DateTime.now(),
+      unlockedDate: null,
       isUnlocked: false,
       progress: 30,
     ),
@@ -35,7 +38,7 @@ class AchievementProvider with ChangeNotifier {
       title: 'Sosyal Kelebek',
       description: 'Etkinliği 5 kişiye paylaş',
       icon: '🦋',
-      unlockedDate: DateTime.now(),
+      unlockedDate: null,
       isUnlocked: false,
       progress: 0,
     ),
@@ -44,7 +47,7 @@ class AchievementProvider with ChangeNotifier {
       title: 'Erken Kuş',
       description: 'Etkinliğine zamanında katıl',
       icon: '🐦',
-      unlockedDate: DateTime.now(),
+      unlockedDate: null,
       isUnlocked: false,
       progress: 40,
     ),
@@ -56,19 +59,17 @@ class AchievementProvider with ChangeNotifier {
       _achievements.where((a) => a.isUnlocked).toList();
 
   int get totalAchievements => _achievements.length;
-  int get unlockedCount => unlockedAchievements.length;
+
+  // Counts directly without creating an intermediate list
+  int get unlockedCount => _achievements.where((a) => a.isUnlocked).length;
 
   void unlockAchievement(String achievementId) {
     final index = _achievements.indexWhere((a) => a.id == achievementId);
     if (index != -1 && !_achievements[index].isUnlocked) {
-      _achievements[index] = Achievement(
-        id: _achievements[index].id,
-        title: _achievements[index].title,
-        description: _achievements[index].description,
-        icon: _achievements[index].icon,
-        unlockedDate: DateTime.now(),
+      _achievements[index] = _achievements[index].copyWith(
         isUnlocked: true,
         progress: 100,
+        unlockedDate: DateTime.now(),
       );
       notifyListeners();
     }
@@ -76,32 +77,20 @@ class AchievementProvider with ChangeNotifier {
 
   void updateProgress(String achievementId, int progress) {
     final index = _achievements.indexWhere((a) => a.id == achievementId);
-    if (index != -1 && progress <= 100) {
-      _achievements[index] = Achievement(
-        id: _achievements[index].id,
-        title: _achievements[index].title,
-        description: _achievements[index].description,
-        icon: _achievements[index].icon,
-        unlockedDate: _achievements[index].unlockedDate,
-        isUnlocked: _achievements[index].isUnlocked,
-        progress: progress,
-      );
+    // Also guard against updating an already unlocked achievement
+    if (index != -1 &&
+        !_achievements[index].isUnlocked &&
+        progress <= 100) {
+      _achievements[index] = _achievements[index].copyWith(progress: progress);
       notifyListeners();
     }
   }
 
   bool isAchievementUnlocked(String achievementId) {
-    return _achievements
-        .firstWhere(
-          (a) => a.id == achievementId,
-          orElse: () => Achievement(
-            id: '',
-            title: '',
-            description: '',
-            icon: '',
-            unlockedDate: DateTime.now(),
-          ),
-        )
-        .isUnlocked;
+    try {
+      return _achievements.firstWhere((a) => a.id == achievementId).isUnlocked;
+    } catch (_) {
+      return false;
+    }
   }
 }

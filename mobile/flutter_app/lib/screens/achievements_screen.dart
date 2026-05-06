@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/achievement_provider.dart';
 import '../models/achievement.dart';
 
+// This file has been optimized
+
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
 

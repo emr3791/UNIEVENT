@@ -5,251 +5,62 @@ import '../providers/auth_provider.dart';
 import '../providers/event_chat_provider.dart';
 import 'event_chat_screen.dart';
 
+// This file has been optimized
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const _kPrimary = Color(0xFF6366F1);
+const _kBgColor = Color(0xFFF7F7F9);
+
+// ── MessagingScreen ───────────────────────────────────────────────────────────
 class MessagingScreen extends StatelessWidget {
   const MessagingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final socialProvider = context.watch<SocialProvider>();
-    final authProvider = context.read<AuthProvider>();
-    final currentUser = authProvider.currentUser;
+    // context.read for AuthProvider — we don't need to rebuild when auth changes
+    final currentUser = context.read<AuthProvider>().currentUser;
     if (currentUser == null) {
       return const Center(child: Text('Giriş yapmanız gerekiyor.'));
     }
 
+    // context.watch only for providers whose changes should rebuild this screen
+    final socialProvider = context.watch<SocialProvider>();
+    final eventRooms = context.watch<EventChatProvider>().allRooms.toList();
     final conversations = socialProvider.conversations;
-    final eventChatProvider = context.watch<EventChatProvider>();
-    final eventRooms = eventChatProvider.allRooms;
     final following = socialProvider.getFollowing(currentUser.id);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F9),
+      backgroundColor: _kBgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6366F1),
-        title: const Text('Mesajlar',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: _kPrimary,
+        title: const Text(
+          'Mesajlar',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Column(
         children: [
-          // Following horizontal list
+          // ── Following horizontal list ────────────────────────────────────
           if (following.isNotEmpty)
-            Container(
-              height: 90,
-              color: Colors.white,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                itemCount: following.length,
-                itemBuilder: (context, i) {
-                  final user = following[i];
-                  return GestureDetector(
-                    onTap: () {
-                      final sameUni = user.university != null &&
-                          currentUser.university != null &&
-                          user.university!.toLowerCase() ==
-                              currentUser.university!.toLowerCase();
-                      socialProvider.getOrCreateConversation(
-                          currentUser.id, user, sameUni);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DirectChatScreen(
-                            peerId: user.id,
-                            peerName: user.fullName,
-                            currentUserId: currentUser.id,
-                            sameUniversity: sameUni,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 14),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 26,
-                                backgroundColor:
-                                    const Color(0xFF6366F1).withAlpha(38),
-                                child: Text(
-                                  user.fullName.isNotEmpty
-                                      ? user.fullName[0]
-                                      : '?',
-                                  style: const TextStyle(
-                                      fontSize: 20, color: Color(0xFF6366F1)),
-                                ),
-                              ),
-                              if (user.isOnline)
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.white, width: 2),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            user.username.length > 8
-                                ? '${user.username.substring(0, 7)}...'
-                                : user.username,
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+            _FollowingBar(
+              following: following,
+              currentUser: currentUser,
+              socialProvider: socialProvider,
             ),
           const Divider(height: 1),
-          // Event chat rooms (from joined/published events)
-          if (eventRooms.isNotEmpty)
-            Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Column(
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Etkinlik Sohbetleri',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${eventRooms.length}'),
-                      ],
-                    ),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: eventRooms.length,
-                    itemBuilder: (context, i) {
-                      final room = eventRooms[i];
-                      final last = room.messages.isNotEmpty
-                          ? room.messages.last.text
-                          : 'Henüz mesaj yok';
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
-                        leading: CircleAvatar(
-                          radius: 26,
-                          backgroundColor:
-                              const Color(0xFF6366F1).withAlpha(31),
-                          child: const Icon(Icons.event_note,
-                              color: Color(0xFF6366F1)),
-                        ),
-                        title: Text(room.eventTitle,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(last,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
-                        trailing: Text('${room.memberIds.length}'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EventChatScreen(
-                                  eventId: room.eventId,
-                                  eventTitle: room.eventTitle),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                ],
-              ),
-            ),
 
-          // Conversations list
+          // ── Event chat rooms ─────────────────────────────────────────────
+          if (eventRooms.isNotEmpty)
+            _EventRoomsSection(eventRooms: eventRooms),
+
+          // ── Conversations list ───────────────────────────────────────────
           Expanded(
             child: conversations.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.chat_bubble_outline,
-                            size: 64, color: Colors.grey.shade300),
-                        const SizedBox(height: 16),
-                        Text('Henüz sohbet yok',
-                            style: TextStyle(
-                                color: Colors.grey.shade500, fontSize: 16)),
-                        const SizedBox(height: 8),
-                        Text(
-                            'Aynı üniversitedeki kullanıcıları takip ettiğinde\notomatik olarak mesajlaşabilirsin.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.grey.shade400, fontSize: 12)),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: conversations.length,
-                    itemBuilder: (context, i) {
-                      final conv = conversations[i];
-                      final lastMsg = conv.messages.isNotEmpty
-                          ? conv.messages.last.text
-                          : 'Henüz mesaj yok';
-                      final hasRequest =
-                          conv.chatRequestSent && !conv.chatRequestAccepted;
-
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
-                        leading: CircleAvatar(
-                          radius: 26,
-                          backgroundColor:
-                              const Color(0xFF6366F1).withAlpha(38),
-                          child: Text(
-                            conv.peerName.isNotEmpty ? conv.peerName[0] : '?',
-                            style: const TextStyle(
-                                fontSize: 18, color: Color(0xFF6366F1)),
-                          ),
-                        ),
-                        title: Text(conv.peerName,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(
-                          hasRequest ? '⏳ Sohbet isteği gönderildi' : lastMsg,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: hasRequest ? Colors.orange : Colors.grey),
-                        ),
-                        onTap: () {
-                          final sameUni = conv.peerUniversity != null &&
-                              currentUser.university != null &&
-                              conv.peerUniversity!.toLowerCase() ==
-                                  currentUser.university!.toLowerCase();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => DirectChatScreen(
-                                peerId: conv.peerId,
-                                peerName: conv.peerName,
-                                currentUserId: currentUser.id,
-                                sameUniversity: sameUni,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                ? const _EmptyConversations()
+                : _ConversationsList(
+              conversations: conversations,
+              currentUser: currentUser,
+            ),
           ),
         ],
       ),
@@ -257,6 +68,283 @@ class MessagingScreen extends StatelessWidget {
   }
 }
 
+// ── Following bar ─────────────────────────────────────────────────────────────
+class _FollowingBar extends StatelessWidget {
+  final List<SocialUser> following;
+  final dynamic currentUser;
+  final SocialProvider socialProvider;
+
+  const _FollowingBar({
+    required this.following,
+    required this.currentUser,
+    required this.socialProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 90,
+      color: Colors.white,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        itemCount: following.length,
+        itemBuilder: (context, i) {
+          final user = following[i];
+          return _FollowingAvatar(
+            user: user,
+            currentUser: currentUser,
+            socialProvider: socialProvider,
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ── Following avatar item — extracted so each rebuilds independently ──────────
+class _FollowingAvatar extends StatelessWidget {
+  final SocialUser user;
+  final dynamic currentUser;
+  final SocialProvider socialProvider;
+
+  const _FollowingAvatar({
+    required this.user,
+    required this.currentUser,
+    required this.socialProvider,
+  });
+
+  bool _isSameUni() {
+    return user.university != null &&
+        currentUser.university != null &&
+        user.university!.toLowerCase() == currentUser.university!.toLowerCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        final sameUni = _isSameUni();
+        socialProvider.getOrCreateConversation(currentUser.id, user, sameUni);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DirectChatScreen(
+              peerId: user.id,
+              peerName: user.fullName,
+              currentUserId: currentUser.id,
+              sameUniversity: sameUni,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: _kPrimary.withAlpha(38),
+                  child: Text(
+                    user.fullName.isNotEmpty ? user.fullName[0] : '?',
+                    style: const TextStyle(fontSize: 20, color: _kPrimary),
+                  ),
+                ),
+                if (user.isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              user.username.length > 8
+                  ? '${user.username.substring(0, 7)}...'
+                  : user.username,
+              style: const TextStyle(fontSize: 11),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Event rooms section ───────────────────────────────────────────────────────
+class _EventRoomsSection extends StatelessWidget {
+  final List<dynamic> eventRooms;
+
+  const _EventRoomsSection({required this.eventRooms});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Etkinlik Sohbetleri',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text('${eventRooms.length}'),
+              ],
+            ),
+          ),
+          // shrinkWrap inside a Column is fine here since the list is
+          // bounded by the Column — not inside a scrollable parent
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: eventRooms.length,
+            itemBuilder: (context, i) {
+              final room = eventRooms[i];
+              final last = room.messages.isNotEmpty
+                  ? room.messages.last.text
+                  : 'Henüz mesaj yok';
+              return ListTile(
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                leading: const CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Color(0xFF6366F1), // withAlpha on const — use solid
+                  child: Icon(Icons.event_note, color: Colors.white),
+                ),
+                title: Text(room.eventTitle,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle:
+                Text(last, maxLines: 1, overflow: TextOverflow.ellipsis),
+                trailing: Text('${room.memberIds.length}'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EventChatScreen(
+                        eventId: room.eventId,
+                        eventTitle: room.eventTitle,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const Divider(height: 1),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+class _EmptyConversations extends StatelessWidget {
+  const _EmptyConversations();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(
+            'Henüz sohbet yok',
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Aynı üniversitedeki kullanıcıları takip ettiğinde\notomatik olarak mesajlaşabilirsin.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Conversations list ────────────────────────────────────────────────────────
+class _ConversationsList extends StatelessWidget {
+  final List<dynamic> conversations;
+  final dynamic currentUser;
+
+  const _ConversationsList({
+    required this.conversations,
+    required this.currentUser,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: conversations.length,
+      itemBuilder: (context, i) {
+        final conv = conversations[i];
+        final lastMsg = conv.messages.isNotEmpty
+            ? conv.messages.last.text
+            : 'Henüz mesaj yok';
+        final hasRequest = conv.chatRequestSent && !conv.chatRequestAccepted;
+        final sameUni = conv.peerUniversity != null &&
+            currentUser.university != null &&
+            conv.peerUniversity!.toLowerCase() ==
+                currentUser.university!.toLowerCase();
+
+        return ListTile(
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          leading: CircleAvatar(
+            radius: 26,
+            backgroundColor: _kPrimary.withAlpha(38),
+            child: Text(
+              conv.peerName.isNotEmpty ? conv.peerName[0] : '?',
+              style: const TextStyle(fontSize: 18, color: _kPrimary),
+            ),
+          ),
+          title: Text(conv.peerName,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text(
+            hasRequest ? '⏳ Sohbet isteği gönderildi' : lastMsg,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: hasRequest ? Colors.orange : Colors.grey),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DirectChatScreen(
+                  peerId: conv.peerId,
+                  peerName: conv.peerName,
+                  currentUserId: currentUser.id,
+                  sameUniversity: sameUni,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// ── DirectChatScreen ──────────────────────────────────────────────────────────
 class DirectChatScreen extends StatefulWidget {
   final String peerId;
   final String peerName;
@@ -298,13 +386,21 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
     });
   }
 
+  void _sendMessage(SocialProvider socialProvider) {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    socialProvider.sendMessage(widget.peerId, text, widget.currentUserId);
+    _controller.clear();
+    _scrollToBottom();
+  }
+
   @override
   Widget build(BuildContext context) {
     final socialProvider = context.watch<SocialProvider>();
     final peer = socialProvider.allUsers.firstWhere(
-      (u) => u.id == widget.peerId,
-      orElse: () => SocialUser(
-          id: widget.peerId, fullName: widget.peerName, username: ''),
+          (u) => u.id == widget.peerId,
+      orElse: () =>
+          SocialUser(id: widget.peerId, fullName: widget.peerName, username: ''),
     );
 
     final conv = socialProvider.getOrCreateConversation(
@@ -317,14 +413,16 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: _kPrimary,
         title: Row(
           children: [
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.white.withAlpha(64),
-              child: Text(widget.peerName.isNotEmpty ? widget.peerName[0] : '?',
-                  style: const TextStyle(color: Colors.white, fontSize: 14)),
+              child: Text(
+                widget.peerName.isNotEmpty ? widget.peerName[0] : '?',
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -334,8 +432,8 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                     style: const TextStyle(fontSize: 15, color: Colors.white)),
                 if (peer.university != null)
                   Text(peer.university!,
-                      style:
-                          const TextStyle(fontSize: 10, color: Colors.white70)),
+                      style: const TextStyle(
+                          fontSize: 10, color: Colors.white70)),
               ],
             ),
           ],
@@ -344,48 +442,14 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
       body: Column(
         children: [
           if (!conv.chatRequestAccepted && !widget.sameUniversity)
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.amber.shade50,
-              child: Column(
-                children: [
-                  const Icon(Icons.lock_clock, color: Colors.amber, size: 28),
-                  const SizedBox(height: 8),
-                  Text('${widget.peerName} farklı bir üniversiteden.',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const Text(
-                      'Mesaj göndermeden önce sohbet isteği göndermeniz gerekiyor.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, color: Colors.black54)),
-                  const SizedBox(height: 12),
-                  if (!conv.chatRequestSent)
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        socialProvider.sendChatRequest(widget.peerId,
-                            widget.peerName, widget.currentUserId, 'Ben');
-                      },
-                      icon:
-                          const Icon(Icons.send, size: 18, color: Colors.white),
-                      label: const Text('Sohbet İsteği Gönder',
-                          style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    )
-                  else
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.hourglass_empty,
-                            size: 16, color: Colors.orange),
-                        SizedBox(width: 6),
-                        Text('İstek gönderildi, bekleniyor...',
-                            style: TextStyle(color: Colors.orange)),
-                      ],
-                    ),
-                ],
+            _ChatRequestBanner(
+              peerName: widget.peerName,
+              conv: conv,
+              onSendRequest: () => socialProvider.sendChatRequest(
+                widget.peerId,
+                widget.peerName,
+                widget.currentUserId,
+                'Ben',
               ),
             ),
           Expanded(
@@ -396,18 +460,87 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
               itemBuilder: (context, index) {
                 final msg = conv.messages[index];
                 final isMe = msg.senderId == widget.currentUserId;
-                return _buildBubble(msg, isMe);
+                return _MessageBubble(msg: msg, isMe: isMe);
               },
             ),
           ),
           if (conv.chatRequestAccepted || widget.sameUniversity)
-            _buildInput(socialProvider),
+            _InputBar(
+              controller: _controller,
+              onSend: () => _sendMessage(socialProvider),
+            ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildBubble(DirectMessage msg, bool isMe) {
+// ── Chat request banner ───────────────────────────────────────────────────────
+class _ChatRequestBanner extends StatelessWidget {
+  final String peerName;
+  final dynamic conv;
+  final VoidCallback onSendRequest;
+
+  const _ChatRequestBanner({
+    required this.peerName,
+    required this.conv,
+    required this.onSendRequest,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.amber.shade50,
+      child: Column(
+        children: [
+          const Icon(Icons.lock_clock, color: Colors.amber, size: 28),
+          const SizedBox(height: 8),
+          Text('$peerName farklı bir üniversiteden.',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Mesaj göndermeden önce sohbet isteği göndermeniz gerekiyor.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          const SizedBox(height: 12),
+          if (!conv.chatRequestSent)
+            ElevatedButton.icon(
+              onPressed: onSendRequest,
+              icon: const Icon(Icons.send, size: 18, color: Colors.white),
+              label: const Text('Sohbet İsteği Gönder',
+                  style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _kPrimary,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            )
+          else
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.hourglass_empty, size: 16, color: Colors.orange),
+                SizedBox(width: 6),
+                Text('İstek gönderildi, bekleniyor...',
+                    style: TextStyle(color: Colors.orange)),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Message bubble — extracted so each message rebuilds independently ─────────
+class _MessageBubble extends StatelessWidget {
+  final dynamic msg;
+  final bool isMe;
+
+  const _MessageBubble({required this.msg, required this.isMe});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         top: 3,
@@ -419,12 +552,13 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Column(
           crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? const Color(0xFF6366F1) : Colors.white,
+                color: isMe ? _kPrimary : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
@@ -459,17 +593,27 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
       ),
     );
   }
+}
 
-  Widget _buildInput(SocialProvider socialProvider) {
+// ── Input bar ─────────────────────────────────────────────────────────────────
+class _InputBar extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onSend;
+
+  const _InputBar({required this.controller, required this.onSend});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withAlpha(15),
-              blurRadius: 8,
-              offset: const Offset(0, -2))
+            color: Colors.black.withAlpha(15),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
       ),
       child: SafeArea(
@@ -483,29 +627,25 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
-                  controller: _controller,
+                  controller: controller,
                   maxLines: null,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => onSend(),
                   decoration: const InputDecoration(
                     hintText: 'Mesaj yaz...',
                     border: InputBorder.none,
                     contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
                 ),
               ),
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () {
-                final text = _controller.text.trim();
-                if (text.isEmpty) return;
-                socialProvider.sendMessage(
-                    widget.peerId, text, widget.currentUserId);
-                _controller.clear();
-              },
+              onTap: onSend,
               child: const CircleAvatar(
                 radius: 22,
-                backgroundColor: Color(0xFF6366F1),
+                backgroundColor: _kPrimary,
                 child: Icon(Icons.send, color: Colors.white, size: 18),
               ),
             ),
@@ -515,5 +655,3 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
     );
   }
 }
-
-// Followers UI removed — Messaging is now focused on conversations only.

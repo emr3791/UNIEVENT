@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 
+// This file has been optimized
+
 class AuthProvider with ChangeNotifier {
   User? _currentUser;
   bool _isLoading = false;
@@ -12,40 +14,48 @@ class AuthProvider with ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   String? get error => _error;
 
+  // ── Internal helpers ──────────────────────────────────────────────────────
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  Future<void> _performLogin(
+      String email, String password, String userType) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _currentUser = User(
+      id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+      email: email,
+      username: email.split('@')[0],
+      fullName: userType == 'student' ? 'Öğrenci Adı' : 'Kullanıcı Adı',
+      userType: userType,
+      gender: 'neutral',
+      avatarSkinTone: 'medium',
+      avatarHairStyle: 'short',
+      avatarFacialHair: 'none',
+    );
+    _isLoggedIn = true;
+  }
+
+  // ── Public methods ────────────────────────────────────────────────────────
+
   Future<void> loginWithStudentEmail({
     required String email,
     required String password,
   }) async {
-    _isLoading = true;
+    _setLoading(true);
     _error = null;
-    notifyListeners();
-
     try {
-      // Email must be a student email
       if (!email.contains('@student.') && !email.endsWith('.edu.tr')) {
         throw Exception('Lütfen geçerli bir öğrenci e-postası girin');
       }
-
-      // Simulated login
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      _currentUser = User(
-        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-        email: email,
-        username: email.split('@')[0],
-        fullName: 'Öğrenci Adı', // örnek isim
-        userType: 'student', gender: 'neutral',
-        avatarSkinTone: 'medium',
-        avatarHairStyle: 'short',
-        avatarFacialHair: 'none',
-      );
-      _isLoggedIn = true;
+      await _performLogin(email, password, 'student');
     } catch (e) {
       _error = e.toString();
       _isLoggedIn = false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -53,10 +63,8 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    _isLoading = true;
+    _setLoading(true);
     _error = null;
-    notifyListeners();
-
     try {
       if (!email.contains('@')) {
         throw Exception('Geçerli bir e-posta adresi girin');
@@ -64,27 +72,12 @@ class AuthProvider with ChangeNotifier {
       if (password.length < 6) {
         throw Exception('Şifre en az 6 karakter olmalı');
       }
-
-      // Simulated login
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      _currentUser = User(
-        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-        email: email,
-        username: email.split('@')[0],
-        fullName: 'Kullanıcı Adı', // örnek isim
-        userType: 'regular', gender: 'neutral',
-        avatarSkinTone: 'medium',
-        avatarHairStyle: 'short',
-        avatarFacialHair: 'none',
-      );
-      _isLoggedIn = true;
+      await _performLogin(email, password, 'regular');
     } catch (e) {
       _error = e.toString();
       _isLoggedIn = false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -97,16 +90,12 @@ class AuthProvider with ChangeNotifier {
     required String gender,
     String? university,
   }) async {
-    _isLoading = true;
+    _setLoading(true);
     _error = null;
-    notifyListeners();
-
     try {
-      // Validation
       if (email.isEmpty || password.isEmpty) {
         throw Exception('Lütfen tüm alanları doldurun');
       }
-
       if (userType == 'student') {
         if (!email.contains('@student.') && !email.endsWith('.edu.tr')) {
           throw Exception(
@@ -116,12 +105,10 @@ class AuthProvider with ChangeNotifier {
           throw Exception('Üniversite bilgisi zorunludur');
         }
       }
-
       if (password.length < 6) {
         throw Exception('Şifre en az 6 karakter olmalı');
       }
 
-      // Simulated registration
       await Future.delayed(const Duration(milliseconds: 800));
 
       _currentUser = User(
@@ -141,12 +128,11 @@ class AuthProvider with ChangeNotifier {
       _error = e.toString();
       _isLoggedIn = false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
-  Future<void> logout() async {
+  void logout() {
     _currentUser = null;
     _isLoggedIn = false;
     _error = null;
@@ -154,26 +140,20 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> deleteAccount() async {
-    _isLoading = true;
+    _setLoading(true);
     _error = null;
-    notifyListeners();
-
     try {
-      // Simulated account deletion
       await Future.delayed(const Duration(milliseconds: 800));
-
       _currentUser = null;
       _isLoggedIn = false;
       _error = null;
     } catch (e) {
       _error = e.toString();
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
-  /// Update user profile information locally.
   void updateProfile({
     String? fullName,
     String? profileImage,
@@ -199,6 +179,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   void clearError() {
+    if (_error == null) return;
     _error = null;
     notifyListeners();
   }
