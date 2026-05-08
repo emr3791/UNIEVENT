@@ -1,3 +1,9 @@
+// This file has been revised
+/* Possible conflicts:
+1. copyWith with nullable fields — if we ever need to explicitly set imageUrl, price, speaker, attendees, or ticketUrl back to null using copyWith, we can't — null is treated as "no change". This is the standard Dart limitation.
+2. date fallback is DateTime.now() — if a bad date comes from the backend, the event will silently show today's date instead of crashing. This is safer but means bad data won't be obvious. Worth adding a debugPrint warning if we want to catch it during development.
+*/
+
 class Event {
   final String id;
   final String title;
@@ -31,22 +37,58 @@ class Event {
     required this.city,
   });
 
+  Event copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? category,
+    String? university,
+    DateTime? date,
+    String? location,
+    String? imageUrl,
+    double? price,
+    String? speaker,
+    int? attendees,
+    bool? isOpenToExternal,
+    String? ticketUrl,
+    String? city,
+  }) {
+    return Event(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      university: university ?? this.university,
+      date: date ?? this.date,
+      location: location ?? this.location,
+      imageUrl: imageUrl ?? this.imageUrl,
+      price: price ?? this.price,
+      speaker: speaker ?? this.speaker,
+      attendees: attendees ?? this.attendees,
+      isOpenToExternal: isOpenToExternal ?? this.isOpenToExternal,
+      ticketUrl: ticketUrl ?? this.ticketUrl,
+      city: city ?? this.city,
+    );
+  }
+
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      category: json['category'] as String,
-      university: json['university'] as String,
-      date: DateTime.parse(json['date'] as String),
-      location: json['location'] as String,
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      university: json['university'] as String? ?? '',
+      // tryParse won't crash on bad/missing date strings
+      date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
+      location: json['location'] as String? ?? '',
       imageUrl: json['imageUrl'] as String?,
-      price: json['price'] as double?,
+      // price may come as int from some backends — handle both
+      price: (json['price'] as num?)?.toDouble(),
       speaker: json['speaker'] as String?,
       attendees: json['attendees'] as int?,
       isOpenToExternal: json['isOpenToExternal'] as bool? ?? false,
       ticketUrl: json['ticketUrl'] as String?,
-      city: json['city'] as String,
+      city: json['city'] as String? ?? '',
     );
   }
 

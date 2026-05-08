@@ -1,4 +1,4 @@
-// This file has been optimized
+// This file has been revised
 // unlockedDate is now nullable!
 
 class Achievement {

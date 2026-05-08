@@ -1,4 +1,12 @@
-// This file has been optimized
+// This file has been revised
+/* Potential conflicts:
+1. Anything that constructs ChatMessage manually and expects a crash on bad data
+Previously bad JSON would throw immediately, making bugs obvious. Now it silently uses fallbacks.
+2. copyWith cannot set nullable fields back to null
+attachmentUrl is nullable, but calling message.copyWith(attachmentUrl: null) won't clear it — null is treated as "no change". If any screen needs to remove an attachment from an existing message, it needs a workaround.
+3. timestamp fallback is DateTime.now()
+If a message arrives from the backend with a missing or malformed timestamp, it will silently show the current time instead of the actual send time. Messages could appear out of order in the chat UI. Worth adding a debugPrint warning
+*/
 
 class ChatMessage {
   final String id;

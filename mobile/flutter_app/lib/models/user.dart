@@ -1,3 +1,5 @@
+// This file was revised
+
 class User {
   final String id;
   final String email;
@@ -61,12 +63,12 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      username: json['username'] as String,
-      fullName: json['fullName'] as String,
+      id: json['id'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
       profileImage: json['profileImage'] as String?,
-      userType: json['userType'] as String,
+      userType: json['userType'] as String? ?? 'regular',
       university: json['university'] as String?,
       city: json['city'] as String?,
       gender: json['gender'] as String?,
