@@ -111,7 +111,7 @@ app.get("/api/events/:id", async (req, res) => {
 // --- AUTH (KAYIT VE GİRİŞ) UÇLARI ---
 
 const registerValidation = [
-  body("name").trim().notEmpty().withMessage("İsim alanı boş bırakılamaz.").isLength({ min: 2 }).withMessage("İsim en az 2 karakter olmalıdır."),
+  body("fullName").trim().notEmpty().withMessage("İsim alanı boş bırakılamaz.").isLength({ min: 2 }).withMessage("İsim en az 2 karakter olmalıdır."),
   body("email").trim().isEmail().withMessage("Geçerli bir e-posta adresi giriniz.").normalizeEmail(),
   body("password").isLength({ min: 6 }).withMessage("Şifre en az 6 karakter olmalıdır.").matches(/\d/).withMessage("Şifre en az bir rakam içermelidir.")
 ];
@@ -121,7 +121,7 @@ app.post("/api/auth/register", registerValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) { return res.status(400).json({ errors: errors.array() }); }
 
-    const { name, email, password } = req.body;
+    const { fullName, email, password } = req.body;
     const usersRef = db.collection("users");
     const snapshot = await usersRef.where("email", "==", email).get();
 
@@ -131,7 +131,7 @@ app.post("/api/auth/register", registerValidation, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newUser = {
-      name: name, email: email, password: hashedPassword,
+      fullName: fullName, email: email, password: hashedPassword,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
@@ -191,7 +191,7 @@ app.post("/api/auth/login", loginValidation, async (req, res) => {
     res.status(200).json({ 
       message: "Giriş başarılı", 
       token: token, // Flutter ekibi bu token'ı cihaz hafızasına kaydedecek
-      user: { id: userId, name: userData.name, email: userData.email } 
+      user: { id: userId, fullName: userData.fullName, email: userData.email } 
     });
 
   } catch (error) {
