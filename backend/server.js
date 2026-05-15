@@ -225,18 +225,23 @@ app.post("/api/auth/login", loginValidation, async (req, res) => {
 
     // --- JWT TOKEN OLUŞTURMA BÖLÜMÜ ---
     // Kullanıcının ID ve email bilgisini içeren, 7 gün geçerli bir dijital kart oluşturuyoruz.
-    // Gerçek projelerde "super_gizli_anahtar" yerine process.env.JWT_SECRET kullanılır.
     const token = jwt.sign(
       { id: userId, email: userData.email }, 
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Yanıta token'ı da ekliyoruz
+    // Yanıta token'ı da ekliyoruz ve frontend için tatlı detayları paslıyoruz
     res.status(200).json({ 
       message: "Giriş başarılı", 
       token: token, // Flutter ekibi bu token'ı cihaz hafızasına kaydedecek
-      user: { id: userId, fullName: userData.fullName, email: userData.email } 
+      user: { 
+        id: userId, 
+        fullName: userData.fullName, 
+        email: userData.email,
+        userType: userData.userType,    // <-- TATLI DOKUNUŞ 1
+        university: userData.university // <-- TATLI DOKUNUŞ 2
+      } 
     });
 
   } catch (error) {
