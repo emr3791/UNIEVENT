@@ -23,19 +23,22 @@ class MessagingScreen extends StatelessWidget {
       return const Center(child: Text('Giriş yapmanız gerekiyor.'));
     }
 
+    final theme = Theme.of(context);
     // context.watch only for providers whose changes should rebuild this screen
     final socialProvider = context.watch<SocialProvider>();
     final eventRooms = context.watch<EventChatProvider>().allRooms.toList();
     final conversations = socialProvider.conversations;
     final following = socialProvider.getFollowing(currentUser.id);
+    final hasEventRooms = eventRooms.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: _kBgColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: _kPrimary,
-        title: const Text(
+        backgroundColor: theme.colorScheme.primary,
+        title: Text(
           'Mesajlar',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -50,17 +53,16 @@ class MessagingScreen extends StatelessWidget {
           const Divider(height: 1),
 
           // ── Event chat rooms ─────────────────────────────────────────────
-          if (eventRooms.isNotEmpty)
-            _EventRoomsSection(eventRooms: eventRooms),
+          if (eventRooms.isNotEmpty) _EventRoomsSection(eventRooms: eventRooms),
 
           // ── Conversations list ───────────────────────────────────────────
           Expanded(
             child: conversations.isEmpty
-                ? const _EmptyConversations()
+                ? _EmptyConversations(hasEventRooms: hasEventRooms)
                 : _ConversationsList(
-              conversations: conversations,
-              currentUser: currentUser,
-            ),
+                    conversations: conversations,
+                    currentUser: currentUser,
+                  ),
           ),
         ],
       ),
@@ -82,9 +84,10 @@ class _FollowingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 90,
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -147,10 +150,13 @@ class _FollowingAvatar extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 26,
-                  backgroundColor: _kPrimary.withAlpha(38),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary.withAlpha(38),
                   child: Text(
                     user.fullName.isNotEmpty ? user.fullName[0] : '?',
-                    style: const TextStyle(fontSize: 20, color: _kPrimary),
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
                 if (user.isOnline)
@@ -191,8 +197,9 @@ class _EventRoomsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: theme.colorScheme.surface,
       child: Column(
         children: [
           Padding(
@@ -200,11 +207,14 @@ class _EventRoomsSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Etkinlik Sohbetleri',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface),
                 ),
-                Text('${eventRooms.length}'),
+                Text('${eventRooms.length}',
+                    style: TextStyle(color: theme.colorScheme.onSurface)),
               ],
             ),
           ),
@@ -221,16 +231,17 @@ class _EventRoomsSection extends StatelessWidget {
                   : 'Henüz mesaj yok';
               return ListTile(
                 contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 leading: const CircleAvatar(
                   radius: 26,
-                  backgroundColor: Color(0xFF6366F1), // withAlpha on const — use solid
+                  backgroundColor:
+                      Color(0xFF6366F1), // withAlpha on const — use solid
                   child: Icon(Icons.event_note, color: Colors.white),
                 ),
                 title: Text(room.eventTitle,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle:
-                Text(last, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(last, maxLines: 1, overflow: TextOverflow.ellipsis),
                 trailing: Text('${room.memberIds.length}'),
                 onTap: () {
                   Navigator.push(
@@ -255,27 +266,43 @@ class _EventRoomsSection extends StatelessWidget {
 
 // ── Empty state ───────────────────────────────────────────────────────────────
 class _EmptyConversations extends StatelessWidget {
-  const _EmptyConversations();
+  final bool hasEventRooms;
+
+  const _EmptyConversations({required this.hasEventRooms});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
-          Text(
-            'Henüz sohbet yok',
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Aynı üniversitedeki kullanıcıları takip ettiğinde\notomatik olarak mesajlaşabilirsin.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.chat_bubble_outline,
+                size: 64, color: theme.colorScheme.onSurface.withOpacity(0.24)),
+            const SizedBox(height: 16),
+            Text(
+              hasEventRooms
+                  ? 'Sohbetleriniz burada listeleniyor.'
+                  : 'Henüz sohbet yok',
+              style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.78),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hasEventRooms
+                  ? 'Etkinlik sohbetleri sekmesinden bir etkinliğe katılarak daha fazla mesajlaşabilirsiniz.'
+                  : 'Daha fazla sohbet için etkinliklere katılın ve yeni sohbetlere dahil olun.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.60),
+                  fontSize: 13),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -293,6 +320,7 @@ class _ConversationsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListView.builder(
       itemCount: conversations.length,
       itemBuilder: (context, i) {
@@ -308,22 +336,30 @@ class _ConversationsList extends StatelessWidget {
 
         return ListTile(
           contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           leading: CircleAvatar(
             radius: 26,
-            backgroundColor: _kPrimary.withAlpha(38),
+            backgroundColor: theme.colorScheme.primary.withAlpha(38),
             child: Text(
               conv.peerName.isNotEmpty ? conv.peerName[0] : '?',
-              style: const TextStyle(fontSize: 18, color: _kPrimary),
+              style: TextStyle(fontSize: 18, color: theme.colorScheme.primary),
             ),
           ),
           title: Text(conv.peerName,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface)),
           subtitle: Text(
             hasRequest ? '⏳ Sohbet isteği gönderildi' : lastMsg,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: hasRequest ? Colors.orange : Colors.grey),
+            style: TextStyle(
+                color: hasRequest
+                    ? Colors.orange
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.78)),
           ),
           onTap: () {
             Navigator.push(
@@ -396,11 +432,12 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final socialProvider = context.watch<SocialProvider>();
     final peer = socialProvider.allUsers.firstWhere(
-          (u) => u.id == widget.peerId,
-      orElse: () =>
-          SocialUser(id: widget.peerId, fullName: widget.peerName, username: ''),
+      (u) => u.id == widget.peerId,
+      orElse: () => SocialUser(
+          id: widget.peerId, fullName: widget.peerName, username: ''),
     );
 
     final conv = socialProvider.getOrCreateConversation(
@@ -413,15 +450,16 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: _kPrimary,
+        backgroundColor: theme.colorScheme.primary,
         title: Row(
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.white.withAlpha(64),
+              backgroundColor: theme.colorScheme.onPrimary.withAlpha(64),
               child: Text(
                 widget.peerName.isNotEmpty ? widget.peerName[0] : '?',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style:
+                    TextStyle(color: theme.colorScheme.primary, fontSize: 14),
               ),
             ),
             const SizedBox(width: 10),
@@ -432,8 +470,8 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                     style: const TextStyle(fontSize: 15, color: Colors.white)),
                 if (peer.university != null)
                   Text(peer.university!,
-                      style: const TextStyle(
-                          fontSize: 10, color: Colors.white70)),
+                      style:
+                          const TextStyle(fontSize: 10, color: Colors.white70)),
               ],
             ),
           ],
@@ -453,16 +491,50 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
               ),
             ),
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: conv.messages.length,
-              itemBuilder: (context, index) {
-                final msg = conv.messages[index];
-                final isMe = msg.senderId == widget.currentUserId;
-                return _MessageBubble(msg: msg, isMe: isMe);
-              },
-            ),
+            child: conv.messages.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_outlined,
+                              size: 72,
+                              color: theme.colorScheme.onBackground
+                                  .withOpacity(0.20)),
+                          const SizedBox(height: 18),
+                          Text(
+                            'Henüz mesaj yok',
+                            style: TextStyle(
+                                color: theme.colorScheme.onBackground
+                                    .withOpacity(0.78),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Yeni bir mesaj göndermek için aşağıdaki kutuyu kullanın.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: theme.colorScheme.onBackground
+                                    .withOpacity(0.60),
+                                fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    itemCount: conv.messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = conv.messages[index];
+                      final isMe = msg.senderId == widget.currentUserId;
+                      return _MessageBubble(msg: msg, isMe: isMe);
+                    },
+                  ),
           ),
           if (conv.chatRequestAccepted || widget.sameUniversity)
             _InputBar(
@@ -489,29 +561,40 @@ class _ChatRequestBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.amber.shade50,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondaryContainer,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+      ),
       child: Column(
         children: [
-          const Icon(Icons.lock_clock, color: Colors.amber, size: 28),
+          Icon(Icons.lock_clock, color: theme.colorScheme.secondary, size: 28),
           const SizedBox(height: 8),
           Text('$peerName farklı bir üniversiteden.',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          const Text(
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSecondaryContainer)),
+          const SizedBox(height: 4),
+          Text(
             'Mesaj göndermeden önce sohbet isteği göndermeniz gerekiyor.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: Colors.black54),
+            style: TextStyle(
+                fontSize: 12,
+                color:
+                    theme.colorScheme.onSecondaryContainer.withOpacity(0.88)),
           ),
           const SizedBox(height: 12),
           if (!conv.chatRequestSent)
             ElevatedButton.icon(
               onPressed: onSendRequest,
-              icon: const Icon(Icons.send, size: 18, color: Colors.white),
-              label: const Text('Sohbet İsteği Gönder',
-                  style: TextStyle(color: Colors.white)),
+              icon: Icon(Icons.send,
+                  size: 18, color: theme.colorScheme.onSecondary),
+              label: Text('Sohbet İsteği Gönder',
+                  style: TextStyle(color: theme.colorScheme.onSecondary)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _kPrimary,
+                backgroundColor: theme.colorScheme.secondary,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
@@ -541,6 +624,7 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(
         top: 3,
@@ -552,13 +636,14 @@ class _MessageBubble extends StatelessWidget {
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Column(
           crossAxisAlignment:
-          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? _kPrimary : Colors.white,
+                color: isMe
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.surface,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
@@ -576,7 +661,9 @@ class _MessageBubble extends StatelessWidget {
               child: Text(
                 msg.text,
                 style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black87,
+                  color: isMe
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSurface,
                   fontSize: 14,
                 ),
               ),
@@ -585,7 +672,12 @@ class _MessageBubble extends StatelessWidget {
               padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
               child: Text(
                 '${msg.sentAt.hour.toString().padLeft(2, '0')}:${msg.sentAt.minute.toString().padLeft(2, '0')}',
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: 10,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(0.56)),
               ),
             ),
           ],
@@ -604,10 +696,11 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(15),
@@ -623,7 +716,7 @@ class _InputBar extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: theme.colorScheme.background,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
@@ -635,7 +728,7 @@ class _InputBar extends StatelessWidget {
                     hintText: 'Mesaj yaz...',
                     border: InputBorder.none,
                     contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
                 ),
               ),
@@ -643,10 +736,11 @@ class _InputBar extends StatelessWidget {
             const SizedBox(width: 8),
             GestureDetector(
               onTap: onSend,
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 22,
-                backgroundColor: _kPrimary,
-                child: Icon(Icons.send, color: Colors.white, size: 18),
+                backgroundColor: theme.colorScheme.primary,
+                child: Icon(Icons.send,
+                    color: theme.colorScheme.onPrimary, size: 18),
               ),
             ),
           ],

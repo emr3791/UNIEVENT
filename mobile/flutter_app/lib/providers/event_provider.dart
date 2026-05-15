@@ -36,15 +36,13 @@ class EventProvider with ChangeNotifier {
   List<String> get joinedEvents => _joinedEventIds.toList();
 
   List<Event> get favoriteEvents {
-    return _cachedFavoriteEvents ??= _events
-        .where((e) => _favoriteEventIds.contains(e.id))
-        .toList();
+    return _cachedFavoriteEvents ??=
+        _events.where((e) => _favoriteEventIds.contains(e.id)).toList();
   }
 
   List<Event> get myEvents {
-    return _cachedMyEvents ??= _events
-        .where((e) => _joinedEventIds.contains(e.id))
-        .toList();
+    return _cachedMyEvents ??=
+        _events.where((e) => _joinedEventIds.contains(e.id)).toList();
   }
 
   final EventService _eventService = EventService();
@@ -74,6 +72,17 @@ class EventProvider with ChangeNotifier {
       for (var i = 0; i < _events.length; i++) {
         _eventParticipants[_events[i].id] = (20 + i * 5) % 100;
       }
+      if (_favoriteEventIds.isEmpty && _joinedEventIds.isEmpty) {
+        if (_events.isNotEmpty) {
+          _favoriteEventIds.add(_events.first.id);
+        }
+        if (_events.length > 2) {
+          _favoriteEventIds.add(_events[2].id);
+        }
+        if (_events.length > 1) {
+          _joinedEventIds.add(_events[1].id);
+        }
+      }
     } catch (e) {
       _error = e.toString();
       _events = [];
@@ -101,10 +110,9 @@ class EventProvider with ChangeNotifier {
   }
 
   List<Event> getUpcomingEvents() {
-    return _cachedUpcomingEvents ??= (_events
-        .where((e) => e.date.isAfter(DateTime.now()))
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date)));
+    return _cachedUpcomingEvents ??=
+        (_events.where((e) => e.date.isAfter(DateTime.now())).toList()
+          ..sort((a, b) => a.date.compareTo(b.date)));
   }
 
   // ── Favorites ─────────────────────────────────────────────────────────────
@@ -149,7 +157,8 @@ class EventProvider with ChangeNotifier {
   }
 
   void joinEvent(String eventId) {
-    if (_joinedEventIds.add(eventId)) { // Set.add() returns false if already present
+    if (_joinedEventIds.add(eventId)) {
+      // Set.add() returns false if already present
       _eventParticipants[eventId] = (_eventParticipants[eventId] ?? 0) + 1;
       _cachedMyEvents = null; // only invalidate what changed
       notifyListeners();
@@ -157,7 +166,8 @@ class EventProvider with ChangeNotifier {
   }
 
   void unjoinEvent(String eventId) {
-    if (_joinedEventIds.remove(eventId)) { // Set.remove() returns false if not present
+    if (_joinedEventIds.remove(eventId)) {
+      // Set.remove() returns false if not present
       _eventParticipants[eventId] =
           ((_eventParticipants[eventId] ?? 1) - 1).clamp(0, 999999);
       _cachedMyEvents = null; // only invalidate what changed
@@ -182,6 +192,5 @@ class EventProvider with ChangeNotifier {
 
   // ── Participants ──────────────────────────────────────────────────────────
 
-  int getParticipantCount(String eventId) =>
-      _eventParticipants[eventId] ?? 0;
+  int getParticipantCount(String eventId) => _eventParticipants[eventId] ?? 0;
 }

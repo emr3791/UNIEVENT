@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/social_provider.dart';
 import '../widgets/app_logo.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -33,8 +34,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _loadingUniversities = false;
   String? _universityError;
 
-  static final List<DropdownMenuItem<String>> _genderItems =
-  ['Kadın', 'Erkek']
+  static final List<DropdownMenuItem<String>> _genderItems = ['Kadın', 'Erkek']
       .map((g) => DropdownMenuItem(value: g, child: Text(g)))
       .toList();
 
@@ -62,12 +62,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         setState(() {
           _universityItems = universities
               .map((uni) => DropdownMenuItem<String>(
-            value: uni['name'] as String,
-            child: Text(
-              uni['name'] as String,
-              style: const TextStyle(color: Colors.black87),
-            ),
-          ))
+                    value: uni['name'] as String,
+                    child: Text(
+                      uni['name'] as String,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                  ))
               .toList();
           _loadingUniversities = false;
         });
@@ -169,6 +169,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     if (!mounted) return;
     if (authProvider.isLoggedIn) {
+      final socialProvider = context.read<SocialProvider>();
+      if (authProvider.currentUser != null) {
+        socialProvider.initForUser(authProvider.currentUser!);
+      }
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       _showError(authProvider.error ?? 'Kayıt başarısız');
@@ -214,8 +218,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Yeni Hesap Oluştur',
-                  style:
-                  TextStyle(fontSize: 16, color: Colors.white.withAlpha(204)),
+                  style: TextStyle(
+                      fontSize: 16, color: Colors.white.withAlpha(204)),
                 ),
                 const SizedBox(height: 32),
                 _UserTypeToggle(
@@ -236,7 +240,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 _buildTextField(
                   controller: _emailController,
                   label:
-                  _isStudentType ? 'Öğrenci E-postası' : 'E-posta Adresi',
+                      _isStudentType ? 'Öğrenci E-postası' : 'E-posta Adresi',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -278,7 +282,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                     )
                   else if (_universityError != null)
-                  // Retry button if fetch failed
+                    // Retry button if fetch failed
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
@@ -308,8 +312,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ? _universityController.text
                           : null,
                       items: _universityItems,
-                      onChanged: (val) =>
-                          setState(() => _universityController.text = val ?? ''),
+                      onChanged: (val) => setState(
+                          () => _universityController.text = val ?? ''),
                     ),
                   const SizedBox(height: 16),
                 ],
@@ -327,10 +331,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   label: 'Şifre Onayı',
                   isObscure: _obscureConfirmPassword,
                   onToggle: () => setState(
-                          () => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
                 const SizedBox(height: 20),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Checkbox(
                       value: _agreedToTerms,
@@ -341,7 +346,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'Şartları ve Koşulları Kabul Ediyorum',
+                        'UniEvent hizmet şartlarını ve kayıt politikamızı okudum ve kabul ediyorum.',
                         style: TextStyle(
                           color: Colors.white.withAlpha(230),
                           fontSize: 13,
@@ -350,42 +355,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Kayıt işlemini tamamlamak için bu onayı vermeniz gereklidir.',
+                    style: TextStyle(
+                      color: Colors.white.withAlpha(180),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, _) {
                     return SizedBox(
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: authProvider.isLoading
+                        onPressed: authProvider.isLoading || !_agreedToTerms
                             ? null
                             : () => _handleRegister(authProvider),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: _kPrimary,
-                          disabledBackgroundColor:
-                          Colors.white.withAlpha(128),
+                          disabledBackgroundColor: Colors.white.withAlpha(128),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
                         child: authProvider.isLoading
                             ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                            AlwaysStoppedAnimation(_kPrimary),
-                          ),
-                        )
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation(_kPrimary),
+                                ),
+                              )
                             : const Text(
-                          'Hesap Oluştur',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: _kPrimary,
-                          ),
-                        ),
+                                'Hesap Oluştur',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: _kPrimary,
+                                ),
+                              ),
                       ),
                     );
                   },

@@ -254,14 +254,32 @@ class _HomeContentState extends State<HomeContent> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Text(
-                      '🔥 Önemli Duyurular',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          '🔥 Önemli Duyurular',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              AnimationUtils.slideLeftTransition(
+                                const AnnouncementsScreen(),
+                              ),
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: theme.colorScheme.onSurface,
+                          ),
+                          child: const Text('Tümünü Gör'),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(

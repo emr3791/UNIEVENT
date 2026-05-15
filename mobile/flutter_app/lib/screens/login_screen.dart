@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/social_provider.dart';
 import '../widgets/app_logo.dart';
 
 // This file was optimized
@@ -39,13 +40,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (_isStudentLogin) {
-      await authProvider.loginWithStudentEmail(email: email, password: password);
+      await authProvider.loginWithStudentEmail(
+          email: email, password: password);
     } else {
-      await authProvider.loginWithEmailPassword(email: email, password: password);
+      await authProvider.loginWithEmailPassword(
+          email: email, password: password);
     }
 
     if (!mounted) return;
     if (authProvider.isLoggedIn) {
+      final socialProvider = context.read<SocialProvider>();
+      if (authProvider.currentUser != null) {
+        socialProvider.initForUser(authProvider.currentUser!);
+      }
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       _showError(authProvider.error ?? 'Giriş başarısız');
@@ -83,7 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Üniversite etkinliklerini keşfet',
-                  style: TextStyle(fontSize: 16, color: Colors.white.withAlpha(230)),
+                  style: TextStyle(
+                      fontSize: 16, color: Colors.white.withAlpha(230)),
                 ),
                 const SizedBox(height: 48),
 
@@ -112,9 +120,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   icon: Icons.lock,
                   obscureText: _obscurePassword,
                   suffixIcon: GestureDetector(
-                    onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onTap: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                     child: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.white.withAlpha(178),
                     ),
                   ),
@@ -140,21 +151,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: authProvider.isLoading
                             ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation(_kPrimary),
-                          ),
-                        )
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation(_kPrimary),
+                                ),
+                              )
                             : const Text(
-                          'Giriş Yap',
-                          style: TextStyle(
-                            color: _kPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                                'Giriş Yap',
+                                style: TextStyle(
+                                  color: _kPrimary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     );
                   },
@@ -167,7 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       'Hesabın yok mu? ',
-                      style: TextStyle(color: Colors.white.withAlpha(204), fontSize: 14),
+                      style: TextStyle(
+                          color: Colors.white.withAlpha(204), fontSize: 14),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pushNamed(context, '/register'),
@@ -187,7 +199,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // ── Guest login ─────────────────────────────────────────────
                 TextButton(
-                  onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+                  onPressed: () =>
+                      Navigator.pushReplacementNamed(context, '/home'),
                   child: const Text(
                     'Misafir Girişi',
                     style: TextStyle(color: Colors.white, fontSize: 14),
@@ -246,7 +259,8 @@ class _LoginTypeToggle extends StatelessWidget {
   final bool isStudentLogin;
   final ValueChanged<bool> onChanged;
 
-  const _LoginTypeToggle({required this.isStudentLogin, required this.onChanged});
+  const _LoginTypeToggle(
+      {required this.isStudentLogin, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {

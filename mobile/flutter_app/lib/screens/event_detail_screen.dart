@@ -19,10 +19,11 @@ class EventDetailScreen extends StatelessWidget {
     final dateFormat = DateFormat('EEEE, dd MMMM yyyy HH:mm', 'tr_TR');
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.currentUser;
+    final isAnnouncement = event.category.toLowerCase() == 'news';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Etkinlik Detayları'),
+        title: Text(isAnnouncement ? 'Duyuru Detayları' : 'Etkinlik Detayları'),
         backgroundColor: theme.colorScheme.primary,
       ),
       drawer: const AppDrawer(),
@@ -162,9 +163,9 @@ class EventDetailScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Description
-                  const Text(
-                    'Etkinlik Hakkında',
-                    style: TextStyle(
+                  Text(
+                    isAnnouncement ? 'Duyuru Hakkında' : 'Etkinlik Hakkında',
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -212,182 +213,190 @@ class EventDetailScreen extends StatelessWidget {
                       ],
                     ),
 
-                  // Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Consumer<EventProvider>(
-                          builder: (context, eventProvider, _) {
-                            final isFavorite =
-                                eventProvider.isFavorite(event.id);
-                            return OutlinedButton.icon(
-                              onPressed: () {
-                                eventProvider.toggleFavorite(event.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(isFavorite
-                                        ? 'Favorilerden çıkarıldı'
-                                        : 'Favorilere eklendi'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              icon: Icon(isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border),
-                              label:
-                                  Text(isFavorite ? 'Favorilerde' : 'Favori'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: isFavorite
-                                    ? Colors.red
-                                    : const Color(0xFF6366F1),
-                                side: BorderSide(
-                                    color: isFavorite
-                                        ? Colors.red
-                                        : const Color(0xFF6366F1)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Consumer<EventProvider>(
-                          builder: (context, eventProvider, _) {
-                            final restrictionMessage = eventProvider
-                                .joinRestrictionMessage(event, user);
-                            final isJoined = eventProvider.isJoined(event.id);
-                            final canJoin = restrictionMessage == null;
-
-                            return ElevatedButton.icon(
-                              onPressed: canJoin
-                                  ? () {
-                                      if (isJoined) {
-                                        eventProvider.unjoinEvent(event.id);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Etkinlikten ayrıldınız'),
-                                              backgroundColor: Colors.orange),
-                                        );
-                                      } else {
-                                        eventProvider.joinEvent(event.id);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text('Etkinliğe katıldınız'),
-                                              backgroundColor: Colors.green),
-                                        );
-                                      }
-                                    }
-                                  : null,
-                              icon: Icon(isJoined ? Icons.check : Icons.add),
-                              label: Text(isJoined ? 'Ayrıl' : 'Katıl'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isJoined
-                                    ? Colors.orange
-                                    : const Color(0xFF6366F1),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Consumer2<EventProvider, NotificationProvider>(
-                          builder: (context, eventProvider,
-                              notificationProvider, _) {
-                            final isReminder =
-                                eventProvider.isReminderSet(event.id);
-                            return OutlinedButton.icon(
-                              onPressed: () {
-                                eventProvider.toggleReminder(event.id);
-                                if (!isReminder) {
-                                  final daysLeft = event.date
-                                      .difference(DateTime.now())
-                                      .inDays;
-                                  final reminderContent = daysLeft > 0
-                                      ? '$daysLeft gün sonra bu etkinlik gerçekleşecek! Katılmak istiyorsan yerini ayırtmayı unutma.'
-                                      : 'Bu etkinlik çok yakında gerçekleşecek! Katılmak istiyorsan acele et.';
-
-                                  notificationProvider.addNotification(
-                                    title: 'Hatırlatma Kuruldu',
-                                    message: reminderContent,
-                                    type: NotificationType.reminder,
+                  if (!isAnnouncement)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Consumer<EventProvider>(
+                            builder: (context, eventProvider, _) {
+                              final isFavorite =
+                                  eventProvider.isFavorite(event.id);
+                              return OutlinedButton.icon(
+                                onPressed: () {
+                                  eventProvider.toggleFavorite(event.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(isFavorite
+                                          ? 'Favorilerden çıkarıldı'
+                                          : 'Favorilere eklendi'),
+                                      duration: const Duration(seconds: 1),
+                                    ),
                                   );
-                                }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(isReminder
-                                        ? 'Hatırlatıcı iptal edildi'
-                                        : 'Hatırlatıcı ayarlandı'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              icon: Icon(isReminder
-                                  ? Icons.notifications_off
-                                  : Icons.notifications_active),
-                              label: Text(isReminder
-                                  ? 'Hatırlatmayı Kapat'
-                                  : 'Hatırlat'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: isReminder
-                                    ? Colors.grey[800]
-                                    : const Color(0xFF6366F1),
-                                side: BorderSide(
-                                  color: isReminder
-                                      ? Colors.grey
+                                },
+                                icon: Icon(isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border),
+                                label:
+                                    Text(isFavorite ? 'Favorilerde' : 'Favori'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: isFavorite
+                                      ? Colors.red
                                       : const Color(0xFF6366F1),
+                                  side: BorderSide(
+                                      color: isFavorite
+                                          ? Colors.red
+                                          : const Color(0xFF6366F1)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      CircleAvatar(
-                        backgroundColor: const Color(0xFF6366F1),
-                        child: IconButton(
-                          icon: const Icon(Icons.share, color: Colors.white),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Paylaşım linki kopyalandı'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Consumer<EventProvider>(
+                            builder: (context, eventProvider, _) {
+                              final restrictionMessage = eventProvider
+                                  .joinRestrictionMessage(event, user);
+                              final isJoined = eventProvider.isJoined(event.id);
+                              final canJoin = restrictionMessage == null;
+
+                              return ElevatedButton.icon(
+                                onPressed: canJoin
+                                    ? () {
+                                        if (isJoined) {
+                                          eventProvider.unjoinEvent(event.id);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Etkinlikten ayrıldınız'),
+                                                backgroundColor: Colors.orange),
+                                          );
+                                        } else {
+                                          eventProvider.joinEvent(event.id);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Etkinliğe katıldınız'),
+                                                backgroundColor: Colors.green),
+                                          );
+                                        }
+                                      }
+                                    : null,
+                                icon: Icon(isJoined ? Icons.check : Icons.add),
+                                label: Text(isJoined ? 'Ayrıl' : 'Katıl'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isJoined
+                                      ? Colors.orange
+                                      : const Color(0xFF6366F1),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Consumer2<EventProvider, NotificationProvider>(
+                            builder: (context, eventProvider,
+                                notificationProvider, _) {
+                              final isReminder =
+                                  eventProvider.isReminderSet(event.id);
+                              return OutlinedButton.icon(
+                                onPressed: () {
+                                  eventProvider.toggleReminder(event.id);
+                                  if (!isReminder) {
+                                    final daysLeft = event.date
+                                        .difference(DateTime.now())
+                                        .inDays;
+                                    final reminderContent = daysLeft > 0
+                                        ? '$daysLeft gün sonra bu etkinlik gerçekleşecek! Katılmak istiyorsan yerini ayırtmayı unutma.'
+                                        : 'Bu etkinlik çok yakında gerçekleşecek! Katılmak istiyorsan acele et.';
+
+                                    notificationProvider.addNotification(
+                                      title: 'Hatırlatma Kuruldu',
+                                      message: reminderContent,
+                                      type: NotificationType.reminder,
+                                    );
+                                  }
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(isReminder
+                                          ? 'Hatırlatıcı iptal edildi'
+                                          : 'Hatırlatıcı ayarlandı'),
+                                      duration: const Duration(seconds: 1),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(isReminder
+                                    ? Icons.notifications_off
+                                    : Icons.notifications_active),
+                                label: Text(isReminder
+                                    ? 'Hatırlatmayı Kapat'
+                                    : 'Hatırlat'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: isReminder
+                                      ? Colors.grey[800]
+                                      : const Color(0xFF6366F1),
+                                  side: BorderSide(
+                                    color: isReminder
+                                        ? Colors.grey
+                                        : const Color(0xFF6366F1),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        CircleAvatar(
+                          backgroundColor: const Color(0xFF6366F1),
+                          child: IconButton(
+                            icon: const Icon(Icons.share, color: Colors.white),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Paylaşım linki kopyalandı'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    ReusableBanner(
+                      icon: Icons.new_releases,
+                      title: 'Duyuru',
+                      subtitle:
+                          'Bu içerik bir duyurudur. Etkinlik kaydı veya hatırlatma gerekli değildir.',
+                    ),
 
                   const SizedBox(height: 16),
 
                   // Join restriction note
-                  Consumer<EventProvider>(
-                    builder: (context, eventProvider, _) {
-                      final restrictionMessage =
-                          eventProvider.joinRestrictionMessage(event, user);
-                      if (restrictionMessage == null) {
-                        return const SizedBox.shrink();
-                      }
-                      return ReusableBanner(
-                        icon: Icons.lock_outline,
-                        title: 'Katılma Kısıtı',
-                        subtitle: restrictionMessage,
-                      );
-                    },
-                  ),
+                  if (!isAnnouncement)
+                    Consumer<EventProvider>(
+                      builder: (context, eventProvider, _) {
+                        final restrictionMessage =
+                            eventProvider.joinRestrictionMessage(event, user);
+                        if (restrictionMessage == null) {
+                          return const SizedBox.shrink();
+                        }
+                        return ReusableBanner(
+                          icon: Icons.lock_outline,
+                          title: 'Katılma Kısıtı',
+                          subtitle: restrictionMessage,
+                        );
+                      },
+                    ),
 
                   const SizedBox(height: 16),
 

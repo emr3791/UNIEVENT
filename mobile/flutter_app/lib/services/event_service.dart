@@ -20,7 +20,8 @@ class EventService {
         ticketUrl: 'https://example.com/ticket1',
         university: 'İTÜ',
         city: 'İstanbul',
-        imageUrl: 'https://via.placeholder.com/150?text=AI+Semineri',
+        imageUrl:
+            'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
       ),
       Event(
         id: '2',
@@ -28,11 +29,12 @@ class EventService {
         description: 'Mobil uygulama geliştirme workshopu.',
         date: DateTime.now().add(const Duration(days: 5)),
         location: 'Boğaziçi Üniversitesi',
-        category: 'Workshop',
+        category: 'Seminer',
         isOpenToExternal: false,
         university: 'Boğaziçi',
         city: 'İstanbul',
-        imageUrl: 'https://via.placeholder.com/150?text=Flutter+Workshop',
+        imageUrl:
+            'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
       ),
       Event(
         id: '3',
@@ -45,7 +47,35 @@ class EventService {
         ticketUrl: 'https://example.com/ticket3',
         university: 'ODTÜ',
         city: 'Ankara',
-        imageUrl: 'https://via.placeholder.com/150?text=Teknoloji+Konferansi',
+        imageUrl:
+            'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?auto=format&fit=crop&w=1200&q=80',
+      ),
+      Event(
+        id: '4',
+        title: 'Açık Hava Konseri',
+        description: 'Yaz akşamında canlı müzik ve DJ performansı.',
+        date: DateTime.now().add(const Duration(days: 7)),
+        location: 'İstanbul Üniversitesi',
+        category: 'Konser',
+        isOpenToExternal: true,
+        university: 'İstanbul Üniversitesi',
+        city: 'İstanbul',
+        imageUrl:
+            'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80',
+      ),
+      Event(
+        id: '5',
+        title: 'UniEvent Duyuru: Yeni Kampüs Rehberi',
+        description:
+            'Üniversitenizdeki yeni rehber uygulaması hakkında detaylar.',
+        date: DateTime.now().add(const Duration(days: 1)),
+        location: 'Online',
+        category: 'news',
+        isOpenToExternal: true,
+        university: 'UniEvent',
+        city: 'Online',
+        imageUrl:
+            'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=1200&q=80',
       ),
     ];
   }

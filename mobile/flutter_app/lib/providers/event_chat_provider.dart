@@ -41,13 +41,8 @@ class EventChatRoom {
     this.isMessagingRestricted = false,
   })  : messages = messages ?? [],
         memberIds = memberIds ?? {},
-        adminIds = adminIds ?? {
-          'dev_admin',
-          'dev_sevval',
-          'dev_esad',
-          'dev_emin',
-          'dev_emrullah'
-        };
+        adminIds = adminIds ??
+            {'dev_admin', 'dev_sevval', 'dev_esad', 'dev_emin', 'dev_emrullah'};
 }
 
 class EventChatProvider extends ChangeNotifier {
@@ -62,6 +57,43 @@ class EventChatProvider extends ChangeNotifier {
     'dev_emrullah',
   };
 
+  EventChatProvider() {
+    _rooms['1'] = EventChatRoom(
+      eventId: '1',
+      eventTitle: 'Yapay Zeka Semineri',
+      memberIds: {'u1', 'u3'},
+      messages: [
+        ChatMessage(
+          id: 'sys_welcome',
+          senderId: 'system',
+          senderName: 'Sistem',
+          text:
+              '🎉 "Yapay Zeka Semineri" etkinlik sohbet odası oluşturuldu. Hoş geldiniz!',
+          sentAt: DateTime.now().subtract(const Duration(minutes: 12)),
+          type: ChatMessageType.system,
+          isAdmin: true,
+        ),
+        ChatMessage(
+          id: 'admin_welcome',
+          senderId: 'dev_admin',
+          senderName: 'UniEvent Admin',
+          text:
+              'Etkinliğe hoş geldiniz! Sorularınızı buradan paylaşabilirsiniz.',
+          sentAt: DateTime.now().subtract(const Duration(minutes: 10)),
+          type: ChatMessageType.announcement,
+          isAdmin: true,
+        ),
+        ChatMessage(
+          id: 'msg1',
+          senderId: 'u1',
+          senderName: 'Ayşe Kaya',
+          text: 'Herkese merhaba, bu konudan sonra kahve içmek isteyen var mı?',
+          sentAt: DateTime.now().subtract(const Duration(minutes: 4)),
+        ),
+      ],
+    );
+  }
+
   EventChatRoom getOrCreateRoom(String eventId, String eventTitle) {
     if (!_rooms.containsKey(eventId)) {
       _rooms[eventId] = EventChatRoom(
@@ -73,7 +105,7 @@ class EventChatProvider extends ChangeNotifier {
             senderId: 'system',
             senderName: 'Sistem',
             text:
-            '🎉 "$eventTitle" etkinlik sohbet odası oluşturuldu! Hoş geldiniz.',
+                '🎉 "$eventTitle" etkinlik sohbet odası oluşturuldu! Hoş geldiniz.',
             sentAt: DateTime.now().subtract(const Duration(minutes: 5)),
             type: ChatMessageType.system,
             isAdmin: true,
@@ -83,7 +115,7 @@ class EventChatProvider extends ChangeNotifier {
             senderId: 'dev_admin',
             senderName: '👑 UniEvent Admin',
             text:
-            'Etkinliğimize katıldığınız için teşekkürler! Sorularınız için buradayız.',
+                'Etkinliğimize katıldığınız için teşekkürler! Sorularınız için buradayız.',
             sentAt: DateTime.now().subtract(const Duration(minutes: 4)),
             type: ChatMessageType.announcement,
             isAdmin: true,
@@ -111,16 +143,18 @@ class EventChatProvider extends ChangeNotifier {
   }
 
   void sendMessage(
-      String eventId,
-      String userId,
-      String senderName,
-      String text, {
-        bool isAdmin = false,
-      }) {
+    String eventId,
+    String userId,
+    String senderName,
+    String text, {
+    bool isAdmin = false,
+  }) {
     if (text.trim().isEmpty) return; // guard against empty messages
     final room = _rooms[eventId];
     if (room == null) return;
-    if (room.isMessagingRestricted && !isAdmin && !developerAdmins.contains(userId)) {
+    if (room.isMessagingRestricted &&
+        !isAdmin &&
+        !developerAdmins.contains(userId)) {
       return;
     }
 

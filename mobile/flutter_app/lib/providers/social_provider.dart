@@ -102,11 +102,46 @@ class SocialProvider extends ChangeNotifier {
   final Map<String, List<SocialUser>> _cachedFollowers = {};
 
   static const List<SocialUser> _mockUsers = [
-    SocialUser(id: 'u1', fullName: 'Ayşe Kaya',    username: 'aysekaya',    university: 'İstanbul Teknik Üniversitesi', isOnline: true,  avatarSkinTone: 'light',  avatarHairStyle: 'default'),
-    SocialUser(id: 'u2', fullName: 'Mehmet Demir', username: 'mehmetdemir', university: 'İstanbul Teknik Üniversitesi', isOnline: false, avatarSkinTone: 'medium', avatarHairStyle: 'curly'),
-    SocialUser(id: 'u3', fullName: 'Zeynep Arslan',username: 'zeyneparslan',university: 'Boğaziçi Üniversitesi',        isOnline: true,  avatarSkinTone: 'dark',   avatarHairStyle: 'default'),
-    SocialUser(id: 'u4', fullName: 'Ali Çelik',    username: 'alicelik',    university: 'Boğaziçi Üniversitesi',        isOnline: false, avatarSkinTone: 'medium', avatarHairStyle: 'bald'),
-    SocialUser(id: 'u5', fullName: 'Fatma Yıldız', username: 'fatmayildiz', university: 'İstanbul Üniversitesi',        isOnline: true,  avatarSkinTone: 'light',  avatarHairStyle: 'white'),
+    SocialUser(
+        id: 'u1',
+        fullName: 'Ayşe Kaya',
+        username: 'aysekaya',
+        university: 'İstanbul Teknik Üniversitesi',
+        isOnline: true,
+        avatarSkinTone: 'light',
+        avatarHairStyle: 'default'),
+    SocialUser(
+        id: 'u2',
+        fullName: 'Mehmet Demir',
+        username: 'mehmetdemir',
+        university: 'İstanbul Teknik Üniversitesi',
+        isOnline: false,
+        avatarSkinTone: 'medium',
+        avatarHairStyle: 'curly'),
+    SocialUser(
+        id: 'u3',
+        fullName: 'Zeynep Arslan',
+        username: 'zeyneparslan',
+        university: 'Boğaziçi Üniversitesi',
+        isOnline: true,
+        avatarSkinTone: 'dark',
+        avatarHairStyle: 'default'),
+    SocialUser(
+        id: 'u4',
+        fullName: 'Ali Çelik',
+        username: 'alicelik',
+        university: 'Boğaziçi Üniversitesi',
+        isOnline: false,
+        avatarSkinTone: 'medium',
+        avatarHairStyle: 'bald'),
+    SocialUser(
+        id: 'u5',
+        fullName: 'Fatma Yıldız',
+        username: 'fatmayildiz',
+        university: 'İstanbul Üniversitesi',
+        isOnline: true,
+        avatarSkinTone: 'light',
+        avatarHairStyle: 'white'),
   ];
 
   List<SocialUser> get allUsers => List.unmodifiable(_allUsers);
@@ -123,10 +158,11 @@ class SocialProvider extends ChangeNotifier {
       ..addAll(_mockUsers);
     _cachedFollowing.clear();
     _cachedFollowers.clear();
+    _conversations.clear();
 
     if (user.university != null) {
       final sameUni = _mockUsers.where((u) =>
-      u.id != user.id &&
+          u.id != user.id &&
           u.university != null &&
           u.university!.toLowerCase().trim() ==
               user.university!.toLowerCase().trim());
@@ -134,6 +170,32 @@ class SocialProvider extends ChangeNotifier {
       for (final peer in sameUni) {
         _addFollow(user.id, peer.id);
         _addFollow(peer.id, user.id);
+      }
+
+      if (sameUni.isNotEmpty) {
+        final peer = sameUni.first;
+        _conversations[peer.id] = DirectConversation(
+          peerId: peer.id,
+          peerName: peer.fullName,
+          peerUniversity: peer.university,
+          chatRequestAccepted: true,
+          messages: [
+            DirectMessage(
+              id: 'dm1',
+              senderId: peer.id,
+              text:
+                  'Merhaba, UniEvent alanında da birbirimizi destekleyebiliriz! 😊',
+              sentAt: DateTime.now().subtract(const Duration(hours: 2)),
+            ),
+            DirectMessage(
+              id: 'dm2',
+              senderId: user.id,
+              text: 'Harika, etkinlik önerileri paylaşıp birlikte gidebiliriz.',
+              sentAt: DateTime.now()
+                  .subtract(const Duration(hours: 1, minutes: 10)),
+            ),
+          ],
+        );
       }
     }
 
@@ -190,20 +252,20 @@ class SocialProvider extends ChangeNotifier {
       String currentUserId, SocialUser peer, bool sameUni) {
     return _conversations.putIfAbsent(
       peer.id,
-          () => DirectConversation(
+      () => DirectConversation(
         peerId: peer.id,
         peerName: peer.fullName,
         peerUniversity: peer.university,
         chatRequestAccepted: sameUni,
         messages: sameUni
             ? [
-          DirectMessage(
-            id: 'm1',
-            senderId: peer.id,
-            text: 'Merhaba! Aynı üniversitedeyiz 🎓',
-            sentAt: DateTime.now().subtract(const Duration(hours: 2)),
-          ),
-        ]
+                DirectMessage(
+                  id: 'm1',
+                  senderId: peer.id,
+                  text: 'Merhaba! Aynı üniversitedeyiz 🎓',
+                  sentAt: DateTime.now().subtract(const Duration(hours: 2)),
+                ),
+              ]
             : [],
       ),
     );
@@ -226,7 +288,7 @@ class SocialProvider extends ChangeNotifier {
       String peerId, String peerName, String fromUserId, String fromName) {
     final conv = _conversations.putIfAbsent(
       peerId,
-          () => DirectConversation(
+      () => DirectConversation(
         peerId: peerId,
         peerName: peerName,
         chatRequestSent: true,

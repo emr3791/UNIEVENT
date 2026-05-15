@@ -122,74 +122,107 @@ class _EventChatScreenState extends State<EventChatScreen> {
               ),
             ),
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: room.messages.length,
-              itemBuilder: (context, index) {
-                final msg = room.messages[index];
-                final isMe = msg.senderId == currentUserId;
-                final isSystem = msg.type == ChatMessageType.system;
-                final isAnnouncement = msg.type == ChatMessageType.announcement;
-
-                if (isSystem) {
-                  return Center(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(20),
+            child: room.messages.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_outlined,
+                              size: 70,
+                              color: theme.colorScheme.onBackground
+                                  .withOpacity(0.20)),
+                          const SizedBox(height: 18),
+                          Text('Henüz mesaj yok',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onBackground
+                                      .withOpacity(0.78))),
+                          const SizedBox(height: 8),
+                          Text(
+                              'Sohbet başlatmak için aşağıdaki kutuya bir mesaj yazın.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: theme.colorScheme.onBackground
+                                      .withOpacity(0.58))),
+                        ],
                       ),
-                      child: Text(msg.text,
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: theme.colorScheme.onSurface
-                                  .withAlpha(191))),
                     ),
-                  );
-                }
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    itemCount: room.messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = room.messages[index];
+                      final isMe = msg.senderId == currentUserId;
+                      final isSystem = msg.type == ChatMessageType.system;
+                      final isAnnouncement =
+                          msg.type == ChatMessageType.announcement;
 
-                if (isAnnouncement) {
-                  return Container(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.campaign,
-                                color: theme.colorScheme.onPrimary, size: 16),
-                            const SizedBox(width: 6),
-                            Text(msg.senderName,
+                      if (isSystem) {
+                        return Center(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(msg.text,
                                 style: TextStyle(
-                                    color: theme.colorScheme.onPrimary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(msg.text,
-                            style: TextStyle(
-                                color: theme.colorScheme.onPrimary,
-                                fontSize: 14)),
-                      ],
-                    ),
-                  );
-                }
+                                    fontSize: 12,
+                                    color: theme.colorScheme.onSurface
+                                        .withAlpha(191))),
+                          ),
+                        );
+                      }
 
-                return _buildMessageBubble(msg, isMe, theme);
-              },
-            ),
+                      if (isAnnouncement) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 4),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.campaign,
+                                      color: theme.colorScheme.onPrimary,
+                                      size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(msg.senderName,
+                                      style: TextStyle(
+                                          color: theme.colorScheme.onPrimary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13)),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(msg.text,
+                                  style: TextStyle(
+                                      color: theme.colorScheme.onPrimary,
+                                      fontSize: 14)),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return _buildMessageBubble(msg, isMe, theme);
+                    },
+                  ),
           ),
           _buildInput(
               room, isAdm, currentUserId, currentUserName, chatProvider, theme),
