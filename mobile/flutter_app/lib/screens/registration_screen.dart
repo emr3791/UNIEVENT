@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../data/istanbul_universities.dart';
 import '../widgets/app_logo.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-// This file has been optimized
-/* Potential conflicts:
-1. _genderItems and _universityItems are static — they're shared across all instances of RegistrationScreen. This is fine since they're read-only, but if you ever need per-instance dropdown items (e.g. filtering by region) you'd need to make them non-static.
-2. _fieldDecoration() uses withAlpha — consistent with the rest of the codebase. If AppTheme ever provides a custom input decoration, replace this method with the theme's decoration instead.
-3. _handleRegister trims inputs before sending — if AuthProvider.register was previously receiving untrimmed strings and any backend logic depended on exact spacing (unlikely but possible), the trim may change behavior.
-4. _UserTypeToggle is a StatelessWidget — it receives isStudentType and onChanged from the parent. If you add animation to the toggle later, it will need to be converted to a StatefulWidget.
-5. DropdownButtonFormField initialValue was removed — it now uses value directly, which is the correct Flutter pattern. The old initialValue parameter was deprecated in newer Flutter versions. If you're on an older Flutter version, check that value: works for your DropdownButtonFormField.
-*/
-
-// ── Constants ─────────────────────────────────────────────────────────────────
 const _kPrimary = Color(0xFF6366F1);
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key}); // ← use super.key
+  const RegistrationScreen({super.key});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -37,17 +28,62 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _obscureConfirmPassword = true;
   bool _agreedToTerms = false;
 
-  // Pre-built dropdown items — built once, not on every rebuild
-  static final List<DropdownMenuItem<String>> _genderItems =
-  ['Kadın', 'Erkek'].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList();
+  // ── University list loaded from API ──────────────────────────────────────
+  List<DropdownMenuItem<String>> _universityItems = [];
+  bool _loadingUniversities = false;
+  String? _universityError;
 
-  static final List<DropdownMenuItem<String>> _universityItems =
-  istanbulUniversities
-      .map((uni) => DropdownMenuItem(
-    value: uni.name,
-    child: Text(uni.name, style: const TextStyle(color: Colors.black87)),
-  ))
+  static final List<DropdownMenuItem<String>> _genderItems =
+  ['Kadın', 'Erkek']
+      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
       .toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUniversities();
+  }
+
+  // ── Fetch universities from backend ──────────────────────────────────────
+
+  Future<void> _fetchUniversities() async {
+    setState(() {
+      _loadingUniversities = true;
+      _universityError = null;
+    });
+
+    try {
+      final url = Uri.parse(
+          'https://unievent-backend-u3wn.onrender.com/api/universities');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> universities = jsonDecode(response.body);
+        setState(() {
+          _universityItems = universities
+              .map((uni) => DropdownMenuItem<String>(
+            value: uni['name'] as String,
+            child: Text(
+              uni['name'] as String,
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ))
+              .toList();
+          _loadingUniversities = false;
+        });
+      } else {
+        setState(() {
+          _universityError = 'Üniversiteler yüklenemedi';
+          _loadingUniversities = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _universityError = 'Bağlantı hatası';
+        _loadingUniversities = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -178,18 +214,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Yeni Hesap Oluştur',
-                  style: TextStyle(fontSize: 16, color: Colors.white.withAlpha(204)),
+                  style:
+                  TextStyle(fontSize: 16, color: Colors.white.withAlpha(204)),
                 ),
                 const SizedBox(height: 32),
-
-                // ── User type toggle ────────────────────────────────────────
                 _UserTypeToggle(
                   isStudentType: _isStudentType,
-                  onChanged: (val) => setState(() => _isStudentType = val),
+                  onChanged: (val) => setState(() {
+                    _isStudentType = val;
+                    // Clear university when switching to non-student
+                    if (!val) _universityController.clear();
+                  }),
                 ),
                 const SizedBox(height: 20),
-
-                // ── Form fields ─────────────────────────────────────────────
                 _buildTextField(
                   controller: _fullNameController,
                   label: 'Ad Soyad',
@@ -198,7 +235,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 const SizedBox(height: 16),
                 _buildTextField(
                   controller: _emailController,
-                  label: _isStudentType ? 'Öğrenci E-postası' : 'E-posta Adresi',
+                  label:
+                  _isStudentType ? 'Öğrenci E-postası' : 'E-posta Adresi',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -209,8 +247,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   icon: Icons.account_circle,
                 ),
                 const SizedBox(height: 16),
-
-                // ── Gender dropdown ─────────────────────────────────────────
                 _buildDropdownField(
                   label: 'Cinsiyet',
                   hint: 'Cinsiyet seçin',
@@ -222,25 +258,68 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                 // ── University dropdown (students only) ─────────────────────
                 if (_isStudentType) ...[
-                  _buildDropdownField(
-                    label: 'Üniversite',
-                    hint: 'Üniversite seçin',
-                    value: _universityController.text.isNotEmpty
-                        ? _universityController.text
-                        : null,
-                    items: _universityItems,
-                    onChanged: (val) =>
-                        setState(() => _universityController.text = val ?? ''),
-                  ),
+                  if (_loadingUniversities)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text('Üniversiteler yükleniyor...',
+                              style: TextStyle(color: Colors.white70)),
+                        ],
+                      ),
+                    )
+                  else if (_universityError != null)
+                  // Retry button if fetch failed
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          Text(_universityError!,
+                              style: const TextStyle(color: Colors.white70)),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: _fetchUniversities,
+                            child: const Text(
+                              'Tekrar Dene',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    _buildDropdownField(
+                      label: 'Üniversite',
+                      hint: 'Üniversite seçin',
+                      value: _universityController.text.isNotEmpty
+                          ? _universityController.text
+                          : null,
+                      items: _universityItems,
+                      onChanged: (val) =>
+                          setState(() => _universityController.text = val ?? ''),
+                    ),
                   const SizedBox(height: 16),
                 ],
 
-                // ── Password fields ─────────────────────────────────────────
                 _buildPasswordField(
                   controller: _passwordController,
                   label: 'Şifre',
                   isObscure: _obscurePassword,
-                  onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onToggle: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 const SizedBox(height: 16),
                 _buildPasswordField(
@@ -251,8 +330,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           () => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
                 const SizedBox(height: 20),
-
-                // ── Terms checkbox ──────────────────────────────────────────
                 Row(
                   children: [
                     Checkbox(
@@ -274,8 +351,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // ── Register button ─────────────────────────────────────────
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, _) {
                     return SizedBox(
@@ -288,7 +363,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: _kPrimary,
-                          disabledBackgroundColor: Colors.white.withAlpha(128),
+                          disabledBackgroundColor:
+                          Colors.white.withAlpha(128),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
@@ -315,8 +391,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // ── Login link ──────────────────────────────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -410,7 +484,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             border: Border.all(color: Colors.white.withAlpha(76), width: 1),
           ),
           child: DropdownButtonFormField<String>(
-            initialValue: value,
+            value: value,
             decoration: const InputDecoration(border: InputBorder.none),
             dropdownColor: Colors.white,
             style: const TextStyle(color: Colors.black87),
@@ -423,7 +497,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // Shared input decoration — built once per call, reused across fields
   InputDecoration _fieldDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -446,15 +519,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 }
 
-// ── User type toggle — extracted to avoid rebuilding whole screen on tap ──────
+// ── Unchanged toggle widgets ──────────────────────────────────────────────────
+
 class _UserTypeToggle extends StatelessWidget {
   final bool isStudentType;
   final ValueChanged<bool> onChanged;
 
-  const _UserTypeToggle({
-    required this.isStudentType,
-    required this.onChanged,
-  });
+  const _UserTypeToggle({required this.isStudentType, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -467,15 +538,13 @@ class _UserTypeToggle extends StatelessWidget {
       child: Row(
         children: [
           _ToggleOption(
-            label: 'Öğrenci',
-            isSelected: isStudentType,
-            onTap: () => onChanged(true),
-          ),
+              label: 'Öğrenci',
+              isSelected: isStudentType,
+              onTap: () => onChanged(true)),
           _ToggleOption(
-            label: 'Diğer Kullanıcı',
-            isSelected: !isStudentType,
-            onTap: () => onChanged(false),
-          ),
+              label: 'Diğer Kullanıcı',
+              isSelected: !isStudentType,
+              onTap: () => onChanged(false)),
         ],
       ),
     );
@@ -487,11 +556,8 @@ class _ToggleOption extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _ToggleOption({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _ToggleOption(
+      {required this.label, required this.isSelected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
