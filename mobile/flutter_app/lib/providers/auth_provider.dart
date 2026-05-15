@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -8,11 +9,13 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _isLoggedIn = false;
   String? _error;
+  String? _token;
 
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _isLoggedIn;
   String? get error => _error;
+  String? get token => _token;
 
   static const _baseUrl = 'https://unievent-backend-u3wn.onrender.com/api';
 
@@ -23,8 +26,6 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Builds a User from the backend's JSON response.
-  // Adjust field names here if your backend returns different keys.
   User _userFromJson(Map<String, dynamic> json, {
     required String email,
     required String username,
@@ -45,6 +46,106 @@ class AuthProvider with ChangeNotifier {
       avatarHairStyle: gender == 'female' ? 'longHair' : 'shortHair',
       avatarFacialHair: 'none',
     );
+  }
+
+  // ── Token persistence ─────────────────────────────────────────────────────
+
+  // Call this in main.dart before runApp() to restore session on app restart
+  Future<void> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedToken = prefs.getString('jwt_token');
+    if (savedToken == null) return;
+
+    _token = savedToken;
+    _isLoggedIn = true;
+    notifyListeners();
+  }
+
+  Future<void> _saveToken(String token, String? userType) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('jwt_token', token);
+    if (userType != null) await prefs.setString('userType', userType);
+  }
+
+  Future<void> _clearToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
+    await prefs.remove('userType');
+  }
+
+  // ── Shared login request ──────────────────────────────────────────────────
+
+  Future<void> _loginRequest({
+    required String email,
+    required String password,
+    String fallbackUserType = 'regular',
+  }) async {
+    _setLoading(true);
+    _error = null;
+
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        // Save token
+        final token = body['token'] as String?;
+        if (token != null) {
+          _token = token;
+          final userJson = body['user'] as Map<String, dynamic>?;
+          await _saveToken(token, userJson?['userType'] as String?);
+        }
+
+        // Build user — prefer data from backend, fall back to what we know
+        final userJson = body['user'] as Map<String, dynamic>? ?? body;
+        _currentUser = _userFromJson(
+          userJson,
+          email: email,
+          username: userJson['username'] as String? ?? email.split('@')[0],
+          fullName: userJson['fullName'] as String? ?? '',
+          userType: userJson['userType'] as String? ?? fallbackUserType,
+          gender: userJson['gender'] as String? ?? 'neutral',
+          university: userJson['university'] as String?,
+        );
+        _isLoggedIn = true;
+      } else {
+        _error = body['error'] as String? ??
+            body['message'] as String? ??
+            'Giriş başarısız (${response.statusCode})';
+        _isLoggedIn = false;
+      }
+    } on http.ClientException {
+      _error = 'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.';
+      _isLoggedIn = false;
+    } catch (e) {
+      _error = 'Beklenmedik hata: $e';
+      _isLoggedIn = false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ── Login (student) ───────────────────────────────────────────────────────
+
+  Future<void> loginWithStudentEmail({
+    required String email,
+    required String password,
+  }) async {
+    await _loginRequest(email: email, password: password, fallbackUserType: 'student');
+  }
+
+  // ── Login (regular) ───────────────────────────────────────────────────────
+
+  Future<void> loginWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    await _loginRequest(email: email, password: password, fallbackUserType: 'regular');
   }
 
   // ── Register ──────────────────────────────────────────────────────────────
@@ -79,6 +180,13 @@ class AuthProvider with ChangeNotifier {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
 
       if (response.statusCode == 201) {
+        // Some backends return a token on register too — save it if present
+        final token = body['token'] as String?;
+        if (token != null) {
+          _token = token;
+          await _saveToken(token, userType);
+        }
+
         _currentUser = _userFromJson(
           body,
           email: email,
@@ -90,14 +198,13 @@ class AuthProvider with ChangeNotifier {
         );
         _isLoggedIn = true;
       } else {
-        // Backend sends { "error": "..." } or { "message": "..." } on failure
         _error = body['error'] as String? ??
             body['message'] as String? ??
             'Kayıt başarısız (${response.statusCode})';
         _isLoggedIn = false;
       }
-    } on http.ClientException catch (e) {
-      _error = 'Bağlantı hatası: ${e.message}';
+    } on http.ClientException {
+      _error = 'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.';
       _isLoggedIn = false;
     } catch (e) {
       _error = 'Beklenmedik hata: $e';
@@ -107,113 +214,27 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // ── Login (student) ───────────────────────────────────────────────────────
+  // ── Logout ────────────────────────────────────────────────────────────────
 
-  Future<void> loginWithStudentEmail({
-    required String email,
-    required String password,
-  }) async {
-    _setLoading(true);
-    _error = null;
-
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
-
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
-
-      if (response.statusCode == 200) {
-        _currentUser = _userFromJson(
-          body,
-          email: email,
-          username: body['username'] as String? ?? email.split('@')[0],
-          fullName: body['fullName'] as String? ?? '',
-          userType: 'student',
-          gender: body['gender'] as String? ?? 'neutral',
-          university: body['university'] as String?,
-        );
-        _isLoggedIn = true;
-      } else {
-        _error = body['error'] as String? ??
-            body['message'] as String? ??
-            'Giriş başarısız (${response.statusCode})';
-        _isLoggedIn = false;
-      }
-    } on http.ClientException catch (e) {
-      _error = 'Bağlantı hatası: ${e.message}';
-      _isLoggedIn = false;
-    } catch (e) {
-      _error = 'Beklenmedik hata: $e';
-      _isLoggedIn = false;
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ── Login (regular) ───────────────────────────────────────────────────────
-
-  Future<void> loginWithEmailPassword({
-    required String email,
-    required String password,
-  }) async {
-    _setLoading(true);
-    _error = null;
-
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
-
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
-
-      if (response.statusCode == 200) {
-        _currentUser = _userFromJson(
-          body,
-          email: email,
-          username: body['username'] as String? ?? email.split('@')[0],
-          fullName: body['fullName'] as String? ?? '',
-          userType: body['userType'] as String? ?? 'regular',
-          gender: body['gender'] as String? ?? 'neutral',
-          university: body['university'] as String?,
-        );
-        _isLoggedIn = true;
-      } else {
-        _error = body['error'] as String? ??
-            body['message'] as String? ??
-            'Giriş başarısız (${response.statusCode})';
-        _isLoggedIn = false;
-      }
-    } on http.ClientException catch (e) {
-      _error = 'Bağlantı hatası: ${e.message}';
-      _isLoggedIn = false;
-    } catch (e) {
-      _error = 'Beklenmedik hata: $e';
-      _isLoggedIn = false;
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // ── Logout / Delete / Profile ─────────────────────────────────────────────
-
-  void logout() {
+  Future<void> logout() async {
+    await _clearToken();
     _currentUser = null;
+    _token = null;
     _isLoggedIn = false;
     _error = null;
     notifyListeners();
   }
+
+  // ── Delete account ────────────────────────────────────────────────────────
 
   Future<void> deleteAccount() async {
     _setLoading(true);
     _error = null;
     try {
       // TODO: call DELETE /api/auth/account when backend supports it
+      await _clearToken();
       _currentUser = null;
+      _token = null;
       _isLoggedIn = false;
     } catch (e) {
       _error = e.toString();
@@ -221,6 +242,8 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
+
+  // ── Update profile ────────────────────────────────────────────────────────
 
   void updateProfile({
     String? fullName,
