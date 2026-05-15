@@ -111,36 +111,55 @@ app.get("/api/events/:id", async (req, res) => {
 // --- AUTH (KAYIT VE GİRİŞ) UÇLARI ---
 
 const registerValidation = [
-  body("fullName").trim().notEmpty().withMessage("İsim alanı boş bırakılamaz.").isLength({ min: 2 }).withMessage("İsim en az 2 karakter olmalıdır."),
-  body("email").trim().isEmail().withMessage("Geçerli bir e-posta adresi giriniz.").normalizeEmail(),
-  body("password").isLength({ min: 6 }).withMessage("Şifre en az 6 karakter olmalıdır.").matches(/\d/).withMessage("Şifre en az bir rakam içermelidir.")
+  body("fullName").notEmpty().withMessage("Tam isim alanı boş bırakılamaz."),
+  body("username").notEmpty().withMessage("Kullanıcı adı boş bırakılamaz."),
+  body("email").isEmail().withMessage("Geçerli bir e-posta adresi girin."),
+  body("password").isLength({ min: 6 }).withMessage("Şifre en az 6 karakter olmalıdır."),
+  body("userType").isIn(['student', 'regular']).withMessage("Geçersiz kullanıcı tipi."),
+  body("gender").isIn(['male', 'female']).withMessage("Geçersiz cinsiyet seçimi.")
 ];
 
 app.post("/api/auth/register", registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) { return res.status(400).json({ errors: errors.array() }); }
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-    const { fullName, email, password } = req.body;
+    // Frontend'den gelen tüm yeni değişkenleri req.body'den çekiyoruz
+    const { email, password, fullName, username, userType, gender, university } = req.body;
+
     const usersRef = db.collection("users");
-    const snapshot = await usersRef.where("email", "==", email).get();
+    
+    // E-posta veya Kullanıcı adı daha önce alınmış mı kontrolü (Opsiyonel ama önerilir)
+    const emailCheck = await usersRef.where("email", "==", email).get();
+    if (!emailCheck.empty) {
+      return res.status(400).json({ error: "Bu e-posta zaten kullanımda." });
+    }
 
-    if (!snapshot.empty) { return res.status(400).json({ error: "Bu e-posta adresi zaten kullanımda." }); }
-
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = {
-      fullName: fullName, email: email, password: hashedPassword,
+      fullName,
+      username,
+      email,
+      password: hashedPassword,
+      userType,
+      gender,
+      university: userType === 'student' ? university : null, // Sadece öğrenciyse üniversiteyi kaydet
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
     const docRef = await usersRef.add(newUser);
-    res.status(201).json({ message: "Kayıt başarıyla oluşturuldu", userId: docRef.id });
+
+    res.status(201).json({ 
+      message: "Kullanıcı başarıyla oluşturuldu", 
+      userId: docRef.id 
+    });
 
   } catch (error) {
     console.error("Kayıt hatası:", error);
-    res.status(500).json({ error: "Kayıt işlemi sırasında bir hata oluştu." });
+    res.status(500).json({ error: "Sunucu hatası oluştu." });
   }
 });
 

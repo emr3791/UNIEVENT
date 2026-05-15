@@ -1,3 +1,6 @@
 node_modules/
 .env
 serviceAccountKey.json
+.env.example
+mobile/flutter_app/.dart_tool/package_config.json
+mobile/flutter_app/.dart_tool/version
