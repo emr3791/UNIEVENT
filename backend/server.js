@@ -108,6 +108,32 @@ app.get("/api/events/:id", async (req, res) => {
   }
 });
 
+// Tüm Üniversiteleri Getiren API Ucu
+app.get("/api/universities", async (req, res) => {
+  try {
+    const unisRef = db.collection("universities");
+    const snapshot = await unisRef.get();
+    
+    if (snapshot.empty) {
+      return res.status(404).json({ message: "Üniversite listesi bulunamadı." });
+    }
+
+    const universities = [];
+    snapshot.forEach(doc => {
+      // Her bir üniversiteyi alıp listeye ekliyoruz
+      // doc.id veritabanındaki belgenin kendi ID'sidir
+      universities.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Frontend'e üniversite listesini yolluyoruz
+    res.status(200).json(universities);
+
+  } catch (error) {
+    console.error("Üniversiteler çekilirken hata:", error);
+    res.status(500).json({ error: "Sunucu hatası oluştu." });
+  }
+});
+
 // --- AUTH (KAYIT VE GİRİŞ) UÇLARI ---
 
 const registerValidation = [
