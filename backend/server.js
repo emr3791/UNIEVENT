@@ -183,7 +183,7 @@ app.post("/api/auth/login", loginValidation, async (req, res) => {
     // Gerçek projelerde "super_gizli_anahtar" yerine process.env.JWT_SECRET kullanılır.
     const token = jwt.sign(
       { id: userId, email: userData.email }, 
-      process.env.JWT_SECRET || "super_gizli_anahtar_123", 
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
