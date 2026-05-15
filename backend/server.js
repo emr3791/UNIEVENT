@@ -149,24 +149,50 @@ const loginValidation = [
   body("password").notEmpty().withMessage("Şifre alanı boş bırakılamaz.")
 ];
 
+// 2. GİRİŞ YAP (Login) - JWT EKLENDİ
 app.post("/api/auth/login", loginValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) { return res.status(400).json({ errors: errors.array() }); }
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     const { email, password } = req.body;
     const usersRef = db.collection("users");
     const snapshot = await usersRef.where("email", "==", email).get();
 
-    if (snapshot.empty) { return res.status(404).json({ error: "Bu e-posta adresine ait kullanıcı bulunamadı." }); }
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "Bu e-posta adresine ait kullanıcı bulunamadı." });
+    }
 
-    let userData; let userId;
-    snapshot.forEach(doc => { userId = doc.id; userData = doc.data(); });
+    let userData;
+    let userId;
+    snapshot.forEach(doc => {
+      userId = doc.id;
+      userData = doc.data();
+    });
 
     const isPasswordValid = await bcrypt.compare(password, userData.password);
-    if (!isPasswordValid) { return res.status(401).json({ error: "Hatalı şifre girdiniz." }); }
 
-    res.status(200).json({ message: "Giriş başarılı", user: { id: userId, name: userData.name, email: userData.email } });
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Hatalı şifre girdiniz." });
+    }
+
+    // --- JWT TOKEN OLUŞTURMA BÖLÜMÜ ---
+    // Kullanıcının ID ve email bilgisini içeren, 7 gün geçerli bir dijital kart oluşturuyoruz.
+    // Gerçek projelerde "super_gizli_anahtar" yerine process.env.JWT_SECRET kullanılır.
+    const token = jwt.sign(
+      { id: userId, email: userData.email }, 
+      process.env.JWT_SECRET || "super_gizli_anahtar_123", 
+      { expiresIn: "7d" }
+    );
+
+    // Yanıta token'ı da ekliyoruz
+    res.status(200).json({ 
+      message: "Giriş başarılı", 
+      token: token, // Flutter ekibi bu token'ı cihaz hafızasına kaydedecek
+      user: { id: userId, name: userData.name, email: userData.email } 
+    });
 
   } catch (error) {
     console.error("Giriş hatası:", error);
